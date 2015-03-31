@@ -1,13 +1,13 @@
 # Rezgo Parser
 
-# VERSION
+VERSION
 	2.4.0
 	
-# AUTHOR
+AUTHOR
 	Kevin Campbell
 	John McDonald
 
-# INSTALL INSTRUCTIONS
+INSTALL INSTRUCTIONS
 
 	Decompress the Rezgo Parser into the web root directory.
 	Rename the /rezgo/include/config.rezgo.php-default to config.rezgo.php.
