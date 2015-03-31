@@ -1,0 +1,47 @@
+/* Rezgo responsive calendar */
+.responsive-calendar {
+	font-family:'Lato', sans-serif;
+	padding:20px;
+	background:#eee;
+}
+.responsive-calendar .controls a {
+  font-size:20px;
+}
+.responsive-calendar .day-headers {
+	height:20px;
+	margin-top:20px;
+}
+.responsive-calendar .day {
+  line-height:1.5 em;
+}
+.responsive-calendar .day.active a {
+  border-radius:10%;
+}
+.responsive-calendar .day.select a {
+	background-color:#398439 !important;
+}
+.responsive-calendar .day.select a:hover {
+	background-color:#449d44 !important;
+}
+.responsive-calendar .day.not-current a {
+	cursor: default;
+}
+.responsive-calendar .day.available a {
+  background-color: #090;
+}
+.responsive-calendar .day.passed a,
+.responsive-calendar .day.cutoff a,
+.responsive-calendar .day.unavailable a {
+	cursor: default;
+}
+.responsive-calendar .day.full a {
+  background-color: #FF9900;
+	border-radius: 10%;
+	color: #FFFFFF;
+	cursor: default;
+}
+.responsive-calendar .day.full a:hover {
+}
+.rezgo-calendar .responsive-calendar .day a {
+	margin:2px;
+}

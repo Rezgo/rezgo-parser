@@ -1,0 +1,50 @@
+# -------------------------------------------------
+# Custom HTTP error pages
+# -------------------------------------------------
+ErrorDocument 404 /frame.php?mode=page_404&title=Page+not+found
+
+RewriteEngine on
+
+# -------------------------------------------------
+# Rules for the new parser addresses
+# -------------------------------------------------
+
+# root page
+RewriteRule ^/?$ /frame.php?mode=index [QSA]
+
+# pre made content pages
+RewriteRule ^contact/?$ /frame.php?mode=page_contact&title=Contact+Us [QSA]
+RewriteRule ^terms/?$ /frame.php?mode=page_terms&title=Booking+Terms [QSA]
+RewriteRule ^about/?$ /frame.php?mode=page_about&title=About+Us [QSA]
+
+# all custom created content pages
+RewriteRule ^page/([^\/]*)/?$ /frame.php?mode=page_content&page=$1 [QSA]
+
+# searches for tag and keyword with optional attached query string
+RewriteRule ^tag/([^\/]*)/?$ /frame.php?mode=index&tags=$1 [QSA]
+RewriteRule ^keyword/([^\/]*)/?$ /frame.php?mode=index&search_in=smart&search_for=$1 [QSA]
+
+# searches for items by company ID (vendor only)
+RewriteRule ^supplier/([^\/]*)/?$ /frame.php?mode=index&cid=$1 [QSA]
+
+# details pages
+RewriteRule ^details/([0-9]+)/([^\/]+)/?$ /frame.php?mode=page_details&com=$1 [QSA]
+RewriteRule ^details/([0-9]+)/([^\/]+)/([0-9]+)/([^\/]+)/?$ /frame.php?mode=page_details&com=$1&option=$3&date=$4 [QSA]
+
+# order and booking pages
+RewriteRule ^order/?$ /frame.php?mode=page_order [QSA]
+RewriteRule ^book/?$ /frame.php?mode=page_book&sec=1&title=Book+Now [QSA]
+
+# complete print and complete display page
+RewriteRule ^complete/([^\/]*)/print/?$ /booking_complete_print.php?trans_num=$1&title=Booking+Receipt [QSA]
+RewriteRule ^complete/([^\/]*)/pdf/?$ /booking_complete_pdf.php?trans_num=$1&title=Booking+Receipt [QSA] 
+RewriteRule ^complete/([^\/]*)/?$ /frame.php?mode=booking_complete&trans_num=$1&title=Booking+Receipt [QSA]
+
+# voucher page
+RewriteRule ^voucher/([^\/]*)/?$ /booking_voucher.php?trans_num=$1&title=Booking+Voucher [QSA]
+
+# dynamic robots.txt
+RewriteRule ^robots\.txt$ /robots.php
+
+# dynamic sitemap.xml
+RewriteRule ^sitemap\.xml$ /sitemap.php

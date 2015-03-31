@@ -1,0 +1,6 @@
+@charset "UTF-8";
+/* CSS for IE 9 */
+
+.rezgo-date-selector .panel-heading {
+	filter:none;
+}

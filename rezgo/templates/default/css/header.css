@@ -1,0 +1,36 @@
+@charset "UTF-8";
+/* CSS Document */
+
+body { 
+padding-top: 50px;
+}
+#rezgo-default-header .rezgo-default-brand {
+	font-size:24px;
+	font-weight:800;
+	color:#FFCC00;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+}
+#rezgo-default-header .rezgo-default-brand:hover {
+	color:#FFF;
+}
+.rezgo-intro {
+	padding-top:50px;
+	background:#eee;
+}
+.rezgo-intro h1 {
+	color:#555;
+	font-size:40px;
+}
+.rezgo-intro p {
+	color:#555;
+	font-size:20px;
+}
+footer {
+    padding-top: 20px;
+	background-color:#000;
+}
+.rezgo-footer-brand {
+    color: #888;
+}

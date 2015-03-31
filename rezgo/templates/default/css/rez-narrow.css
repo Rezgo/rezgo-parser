@@ -1,0 +1,14 @@
+@charset "UTF-8";
+/* Narrow view css */
+
+.rezgo-form-group {
+	padding:5px;
+}
+.rezgo-breadcrumb {
+    font-size: 18px;
+    font-weight: bold;
+    padding: 3px 5px;
+}
+.rezgo-searchbox {
+    padding: 10px;
+}
