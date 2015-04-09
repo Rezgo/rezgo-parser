@@ -50,7 +50,7 @@
 	
 	// By default, rezgo will use your own site as the secure site if forwarding is disabled,
 	// if you want to use a different URL, then set it here (do not include https://)
-	define( "REZGO_SECURE_URL",					$this_uri.'.'.$base_url												);
+	define( "REZGO_SECURE_URL",					''												);
 	
 	// Disable the header and footer passed from the XML gateway. Enable this if you are embedding
 	// rezgo inside your own design.  This is only used by the header and footer templates
