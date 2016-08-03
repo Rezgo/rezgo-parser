@@ -4,7 +4,7 @@
 		This is the Rezgo parser class, it handles processing for the Rezgo XML.
 		
 		VERSION:
-				2.4.0
+				2.5.0
 		
 		- Documentation and latest version
 				http://support.rezgo.com/customer/portal/articles/1153719-open-source-php-parser
@@ -49,8 +49,12 @@
 
 	class RezgoSite {
 	
-		var $version = '2.4.0';
-	
+		var $version = '2.5.0';
+		
+		var $requestID;
+		
+		var $instanceID;
+		
 		var $xml_path;
 		
 		var $contents;
@@ -115,15 +119,24 @@
 		// if the class was called with an argument then we use that as the object name
 		// this allows us to load the object globalls for included templates.
 		// ------------------------------------------------------------------------------
-		function __construct($secure=null) {
+		function __construct($secure=null, $newID=null) {
 			if(!$this->config('REZGO_SKIP_BUFFER')) ob_start();
 		
 			// check the config file to make sure it's loaded
 			if(!$this->config('REZGO_CID')) $this->error('REZGO_CID definition missing, check config file', 1);
-		
-			// assemble XML address
-			$this->xml_path = REZGO_XML.'/xml?transcode='.REZGO_CID.'&key='.REZGO_API_KEY;
-			$this->advanced_xml_path = REZGO_XML.'/xml?xml='.urlencode('<request><transcode>'.REZGO_CID.'</transcode><key>'.REZGO_API_KEY.'</key>');
+			
+			if($newID) { $this->requestID = $this->setRequestID(); }
+			else { $this->requestID = ($_SESSION['requestID']) ? $_SESSION['requestID'] : $this->setRequestID(); }
+			
+			// get request ID if it exists, otherwise generate a fresh one
+			$this->requestID = ($_SESSION['requestID']) ? $_SESSION['requestID'] : $this->setRequestID();
+			
+			$this->origin = $this->config('REZGO_ORIGIN');
+			
+			// assemble API address
+			$this->xml_path = REZGO_XML.'/xml?transcode='.REZGO_CID.'&key='.REZGO_API_KEY.'&req='.$this->requestID.'&g='.$this->origin;
+			$this->api_post_string = 'xml='.urlencode('<request><transcode>'.REZGO_CID.'</transcode><key>'.REZGO_API_KEY.'</key>');
+			$this->advanced_xml_path = REZGO_XML.'/xml?req='.$this->requestID.'&g='.$this->origin.'&'.$this->api_post_string;
 			
 			// assemble template and url path
 			$this->path = REZGO_DIR.'/templates/'.REZGO_TEMPLATE;
@@ -335,6 +348,32 @@
 			}
 		}
 		
+		function setRequestID() {
+			$this->requestID = $_SESSION['requestID'] = $this->config('REZGO_CID').'-'.time().'-'.$this->randstring(4);
+			return $this->requestID;
+		}
+		
+		function getRequestID() {
+			return $this->requestID;
+		}
+		
+		// generate a random string
+		function randstring($len = 10) {
+			$len = $len / 2;
+			
+	    $timestring = microtime();
+	    $secondsSinceEpoch=(integer) substr($timestring, strrpos($timestring, " "), 100);
+	    $microseconds=(double) $timestring;
+	    $seed = mt_rand(0,1000000000) + 10000000 * $microseconds + $secondsSinceEpoch;
+	    mt_srand($seed);
+	    $randstring = "";
+	    for($i=0; $i < $len; $i++) {
+	      $randstring .= mt_rand(0, 9);
+	      $randstring .= chr(ord('A') + mt_rand(0, 24));
+	    }
+	   	return($randstring);
+	  }
+		
 		function secureURL() {
 			if($this->config('REZGO_FORWARD_SECURE')) {
 				// forward is set, so we want to direct them to their .rezgo.com domain	
@@ -375,7 +414,12 @@
 			
 			return $r;
 		}
-
+		
+		// remove all attributes from a user-entered field
+		function cleanAttr($request) {
+			$r = preg_replace("/<([a-z][a-z0-9]*)[^>]*?(\/?)>/i",'<$1$2>', $request);
+			return $r;
+		}
 		
 		// ------------------------------------------------------------------------------
 		// read a tour item object into the cache so we can format it later
@@ -441,7 +485,7 @@
 		}
 		
 		// ------------------------------------------------------------------------------
-		// Toggles secure (https) or insecure (http) mode for XML queries. Secure mode
+		// Toggles secure (https) or insecure (http) mode for API queries. Secure mode
 		// is required when making all commit or modification requests.
 		// ------------------------------------------------------------------------------		
 		function checkSecure() {
@@ -563,19 +607,23 @@
 		}
 		
 		// ------------------------------------------------------------------------------
-		// Make an XML request to Rezgo. $i supports all arguments that the XML gateway
-		// supports for pre-generated queries, or a full query can be passed directly
+		// Make an API request to Rezgo. $i supports all arguments that the API supports
+		// for pre-generated queries, or a full query can be passed directly
 		// ------------------------------------------------------------------------------
-		function getFile($url) {
+		function getFile($url, $post='') {
 			include('fetch.rezgo.php');
 			return $result;
 		}
 		
-		function fetchXML($i) {
-			$file = $this->getFile($i);
+		function fetchXML($i, $post='') {
 			
-			// sanity check for response, ensure the XML response is valid
-			if(strpos($file, '<!0!>') !== false) return false;
+			$file = $this->getFile($i, $post);
+			
+			// sanity check for response, ensure the API response is valid
+			if(strpos($file, '<!0!>') !== false) {
+				$this->debug('XML ERROR RETURNED: '.$file, $i);
+				return false;
+			}
 			
 			// attempt to filter out any junk data
 			$file = strstr($file, '<response');
@@ -595,7 +643,7 @@
 			  }
 				$this->error('FATAL ERROR WITH XML PARSER ('.$i.') '.$error_set);
 				
-				// there has been a fatal error with the XML, report the error to the gateway
+				// there has been a fatal error with the API, report the error to the gateway
 				$this->getFile($i.'&action=report');
 				
 				// send the user to the fatal error page
@@ -733,6 +781,7 @@
 				$xml = $this->fetchXML($query);
 				
 				if($xml) {
+					$this->commit_response = new stdClass();
 					foreach($xml as $k => $v) {
 						$this->commit_response->$k = trim((string)$v);	
 					}
@@ -740,11 +789,14 @@
 			}
 			// !new commit mode
 			if($i == 'commitOrder') {
-				$query = 'https://'.$this->advanced_xml_path.urlencode('<instruction>commit</instruction><cart>'.$this->getCartIDs().'</cart>'.$arguments.'</request>');
+				$query = 'https://'.$this->xml_path;
 				
-				$xml = $this->fetchXML($query);
+				$post = $this->api_post_string.urlencode('<instruction>commit</instruction><cart>'.$this->getCartIDs().'</cart>'.$arguments.'</request>');
+				
+				$xml = $this->fetchXML($query, $post);
 				
 				if($xml) {
+					$this->commit_response = new stdClass();
 					foreach($xml as $k => $v) {
 						$this->commit_response->$k = trim((string)$v);	
 					}
@@ -766,7 +818,7 @@
 			if(REZGO_TRACE_XML) {
 				if(!$query && REZGO_INCLUDE_CACHE_XML) $query = 'called cached response';
 				if($query) {
-					$message = $i.' ('.$query.')';
+					$message = $i.' ('.$query.(($post) ? '&'.$post : '').')';
 					$this->debug('XML REQUEST: '.$message, $i); // pass the $i as well so we can freeze on commit
 				}
 			}
@@ -969,6 +1021,13 @@
 			
 			$xml = $this->fetchXML($query);
 			
+			if(REZGO_TRACE_XML) {
+				if($query) {
+					$message = 'month'.' ('.$query.')';
+					$this->debug('XML REQUEST: '.$message, 'month'); 
+				}
+			}
+			
 			// update the date with the one provided from the XML response
 			// this is done in case we hopped ahead with the XML search (a=available)
 			$date = $xml->year.'-'.$xml->month.'-15';
@@ -1001,6 +1060,7 @@
 			
 			$n = 0;
 			foreach($months as $k => $v) {
+				$this->calendar_months[$n] = new stdClass();
 				$this->calendar_months[$n]->selected = ($v == date("F", $date)) ? 'selected' : '';
 				$this->calendar_months[$n]->value = $year.'-'.$v.'-15';
 				$this->calendar_months[$n]->label = $k;
@@ -1008,6 +1068,7 @@
 			}
 		
 			for($y=date("Y", strtotime(date("Y").' -1 year')); $y<=date("Y", strtotime(date("Y").' +4 years')); $y++) {
+				$this->calendar_years[$n] = new stdClass();
 				$this->calendar_years[$n]->selected = ($y == date("Y", $date)) ? 'selected' : '';
 				$this->calendar_years[$n]->value = $y.'-'.$month.'-15';
 				$this->calendar_years[$n]->label = $y;
@@ -1025,6 +1086,7 @@
 				$last_display = date("t", strtotime($prev_date)) - ($start_offset-2);
 				
 				for($d=1; $d<$start_offset; $d++) {
+					$obj = isset($obj) ? $obj : new stdClass();
 					$obj->day = $last_display;
 					$obj->lead = 1; // mark as lead up day, so it's not counted in getCalendarDays($day) calls
 					$this->calendar_days[] = $obj;				
@@ -1035,6 +1097,8 @@
 			
 			$w = $start_offset;
 			for($d=1; $d<=$end_day; $d++) {		
+				$obj = isset($obj) ? $obj : new stdClass();
+				
 				$xd = $d - 1;			
 				$obj->type = 1;
 				
@@ -1045,17 +1109,19 @@
 						$n=0;
 						foreach($xml->day->$xd->item as $i) {
 							if($i) {
-							$obj->items[$n]->uid = $i->uid;
-							$obj->items[$n]->name = $i->name;
-							$obj->items[$n]->availability = $i->attributes()->value;
-							$n++;
+								$obj->items[$n] = new stdClass();
+								$obj->items[$n]->uid = $i->uid;
+								$obj->items[$n]->name = $i->name;
+								$obj->items[$n]->availability = $i->attributes()->value;
+								$n++;
 							}
 						}
 					} else {
 						if($xml->day->$xd->item) {
-						$obj->items[0]->uid = $xml->day->$xd->item->uid;
-						$obj->items[0]->name = $xml->day->$xd->item->name;
-						$obj->items[0]->availability = $xml->day->$xd->item->attributes()->value;
+							$obj->items[0] = new stdClass();
+							$obj->items[0]->uid = $xml->day->$xd->item->uid;
+							$obj->items[0]->name = $xml->day->$xd->item->name;
+							$obj->items[0]->availability = $xml->day->$xd->item->attributes()->value;
 						}
 					}
 				}
@@ -1075,7 +1141,7 @@
 				while($w != 8) {
 					$d++;
 					$w++;
-					
+					$obj = isset($obj) ? $obj : new stdClass();
 					$obj->day = $d;			
 					$this->calendar_days[] = $obj;
 					unset($obj);
@@ -1189,7 +1255,12 @@
 						if($i->date) {
 							if($i->date[0]) {
 								foreach($i->date as $d) {
+									$res[(string)$i->com][strtotime((string)$d->attributes()->value)] = new stdClass();
+									
 									$res[(string)$i->com][strtotime((string)$d->attributes()->value)]->id = $c;
+									
+									$res[(string)$i->com][strtotime((string)$d->attributes()->value)]->items[$c] = new stdClass();
+									
 									$res[(string)$i->com][strtotime((string)$d->attributes()->value)]->items[$c]->name = (string)$i->time;
 									$res[(string)$i->com][strtotime((string)$d->attributes()->value)]->items[$c]->availability = (string)$d->availability;
 									$res[(string)$i->com][strtotime((string)$d->attributes()->value)]->items[$c]->hide_availability = (string)$d->hide_availability;
@@ -1197,7 +1268,12 @@
 									$res[(string)$i->com][strtotime((string)$d->attributes()->value)]->date = strtotime((string)$d->attributes()->value);
 								}
 							} else {
+								$res[(string)$i->com][strtotime((string)$i->date->attributes()->value)] = new stdClass();
+								
 								$res[(string)$i->com][strtotime((string)$i->date->attributes()->value)]->id = $c;
+								
+								$res[(string)$i->com][strtotime((string)$i->date->attributes()->value)]->items[$c] = new stdClass();
+								
 								$res[(string)$i->com][strtotime((string)$i->date->attributes()->value)]->items[$c]->name = (string)$i->time;
 								$res[(string)$i->com][strtotime((string)$i->date->attributes()->value)]->items[$c]->availability = (string)$i->date->availability;
 								$res[(string)$i->com][strtotime((string)$i->date->attributes()->value)]->items[$c]->hide_availability = (string)$i->date->hide_availability;
@@ -1226,6 +1302,7 @@
 			$valid_count = 0;
 			
 			if($this->exists($obj->date->price_adult)) {
+				$ret[$c] = new stdClass();
 				$ret[$c]->name = 'adult';
 				$ret[$c]->label = (string) $obj->adult_label;
 				$ret[$c]->required = (string) $obj->adult_required;
@@ -1236,6 +1313,7 @@
 				$valid_count++;
 			}
 			if($this->exists($obj->date->price_child)) {
+				$ret[$c] = new stdClass();
 				$ret[$c]->name = 'child';
 				$ret[$c]->label = (string) $obj->child_label;
 				$ret[$c]->required = (string) $obj->child_required;
@@ -1246,6 +1324,7 @@
 				$valid_count++;
 			}
 			if($this->exists($obj->date->price_senior)) {
+				$ret[$c] = new stdClass();
 				$ret[$c]->name = 'senior';
 				$ret[$c]->label = (string) $obj->senior_label;
 				$ret[$c]->required = (string) $obj->senior_required;
@@ -1259,6 +1338,7 @@
 			for($i=4; $i<=9; $i++) {
 				$val = 'price'.$i;
 				if($this->exists($obj->date->$val)) {
+					$ret[$c] = new stdClass();
 					$ret[$c]->name = 'price'.$i;
 					$val = 'price'.$i.'_label';
 					$ret[$c]->label = (string) $obj->$val;
@@ -1326,10 +1406,11 @@
 		}
 		
 		function getTourMedia(&$obj=null) {
-			if(!$obj) $obj = $this->getItem();			
+			if(!$obj) $obj = $this->getItem();
 			$c = 0;
 			if($obj->media->image) {
 				foreach($obj->media->image as $v) {
+					$ret[$c] = new stdClass();
 					$ret[$c]->image = $v->path;
 					$ret[$c]->path = $v->path;
 					$ret[$c]->caption = $v->caption;
@@ -1344,6 +1425,8 @@
 			$c = 0;
 			if($obj->related->item) {
 				foreach($obj->related->item as $v) {
+					$ret[$c] = new stdClass();
+					
 					$ret[$c]->com = $v->com;
 					$ret[$c++]->name = $v->name;
 				}
@@ -1379,6 +1462,8 @@
 				if($obj->{$type.'_forms'}) {
 					
 					foreach($obj->{$type.'_forms'}->form as $f) {
+						$res[$type][(string)$f->id] = new stdClass();
+						
 						$res[$type][(string)$f->id]->id = (string)$f->id;
 						$res[$type][(string)$f->id]->type = (string)$f->type;
 						$res[$type][(string)$f->id]->title = (string)$f->title;
@@ -1453,6 +1538,8 @@
 			
 			$c=0;
 			if($obj->adult_num >= 1) {
+				$ret[$c] = new stdClass();
+				
 				$ret[$c]->name = 'adult';
 				$ret[$c]->label = (string) $obj->adult_label;
 				($obj->prices->base_prices->price_adult) ? $ret[$c]->base = (string) $obj->prices->base_prices->price_adult : 0;
@@ -1461,6 +1548,8 @@
 				$ret[$c++]->total = (string) $obj->prices->price_adult;
 			}
 			if($obj->child_num >= 1) {
+				$ret[$c] = new stdClass();
+				
 				$ret[$c]->name = 'child';
 				$ret[$c]->label = (string) $obj->child_label;
 				($obj->prices->base_prices->price_child) ? $ret[$c]->base = (string) $obj->prices->base_prices->price_child : 0;
@@ -1469,6 +1558,8 @@
 				$ret[$c++]->total = (string) $obj->prices->price_child;
 			}
 			if($obj->senior_num >= 1) {
+				$ret[$c] = new stdClass();
+				
 				$ret[$c]->name = 'senior';
 				$ret[$c]->label = (string) $obj->senior_label;
 				($obj->prices->base_prices->price_senior) ? $ret[$c]->base = (string) $obj->prices->base_prices->price_senior : 0;
@@ -1480,6 +1571,8 @@
 			for($i=4; $i<=9; $i++) {
 				$val = 'price'.$i.'_num';
 				if($obj->$val >= 1) {
+					$ret[$c] = new stdClass();
+					
 					$ret[$c]->name = 'price'.$i;
 					$val = 'price'.$i.'_label';
 					$ret[$c]->label = (string) $obj->$val;
@@ -1619,6 +1712,7 @@
 				$num = $v.'_num';
 				$label = $v.'_label';
 				if($obj->$num > 0) {
+					$ret[$c] = new stdClass();
 					$ret[$c]->label = $obj->$label;
 					$ret[$c++]->num = $obj->$num;
 				}
@@ -1831,6 +1925,7 @@
 			($r['tour_postal_code']) ? $res[] = '<tour_postal_code>'.$r['tour_postal_code'].'</tour_postal_code>' : 0;
 			($r['tour_phone_number']) ? $res[] = '<tour_phone_number>'.$r['tour_phone_number'].'</tour_phone_number>' : 0;
 			($r['tour_email_address']) ? $res[] = '<tour_email_address>'.$r['tour_email_address'].'</tour_email_address>' : 0;
+			($r['sms']) ? $res[] = '<sms>'.$r['sms'].'</sms>' : 0;
 			
 			($r['payment_method']) ? $res[] = '<payment_method>'.urlencode(stripslashes($r['payment_method'])).'</payment_method>' : 0;
 			
@@ -2044,4 +2139,3 @@
 		
 	}
 	
-?>

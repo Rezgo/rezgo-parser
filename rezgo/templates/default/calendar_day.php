@@ -17,7 +17,7 @@
 ?>
 
   <?=$availability_title?>
-  <div class="panel-group" id="rezgo-select-option-<?=$option_num?>">
+  <div class="panel-group" id="rezgo-select-option-<?=$option_num?>"> 
   
   <? if (count($options) != 1) { //  && $option_num != 1?>
   <span class="rezgo-choose-options">Choose one of the options below <i class="fa fa-angle-double-down"></i></span>
@@ -25,6 +25,8 @@
   
   <? 
     //$option_total = count($site->getTours('t=com&q='.$_REQUEST['com'].'&d='.$_REQUEST['date']));
+		
+		$sub_option = 'a';
     
     foreach($options as $option) {
 	    
@@ -34,37 +36,37 @@
   
   <div class="panel panel-default">
 		<script>
-      var fields_<?=$option_num?> = new Array();
-			var required_num_<?=$option_num?> = 0;
+      var fields_<?=$option_num.'_'.$sub_option?> = new Array();
+			var required_num_<?=$option_num.'_'.$sub_option?> = 0;
 				
 			function isInt(n) {
 				 return n % 1 === 0;
 			} 
       
       // validate form data
-      function check_<?=$option_num?>() {
+      function check_<?=$option_num.'_'.$sub_option?>() {
         var err;
-        var count_<?=$option_num?> = 0;
-        var required_<?=$option_num?> = 0;
+        var count_<?=$option_num.'_'.$sub_option?> = 0;
+        var required_<?=$option_num.'_'.$sub_option?> = 0;
         
-        for(v in fields_<?=$option_num?>) {
+        for(v in fields_<?=$option_num.'_'.$sub_option?>) {
           // total number of spots
-          count_<?=$option_num?> += $('#' + v).val() * 1;
+          count_<?=$option_num.'_'.$sub_option?> += $('#' + v).val() * 1;
           // has a required price point been used
-          if(fields_<?=$option_num?>[v] && $('#' + v).val() >= 1) { required_<?=$option_num?> = 1; }
+          if(fields_<?=$option_num.'_'.$sub_option?>[v] && $('#' + v).val() >= 1) { required_<?=$option_num.'_'.$sub_option?> = 1; }
         }
         
-        if(count_<?=$option_num?> == 0 || !count_<?=$option_num?>) {
+        if(count_<?=$option_num.'_'.$sub_option?> == 0 || !count_<?=$option_num.'_'.$sub_option?>) {
           err = 'Please enter the number you would like to book.';
-        } else if(required_num_<?=$option_num?> > 0 && required_<?=$option_num?> == 0) {
+        } else if(required_num_<?=$option_num.'_'.$sub_option?> > 0 && required_<?=$option_num.'_'.$sub_option?> == 0) {
           err = 'At least one marked ( * ) price point is required to book.';
-        } else if(!isInt(count_<?=$option_num?>)) {
+        } else if(!isInt(count_<?=$option_num.'_'.$sub_option?>)) {
 					err = 'Please enter a whole number. No decimal places allowed.';
-				} else if(count_<?=$option_num?> < <?=$option->per?>) {
+				} else if(count_<?=$option_num.'_'.$sub_option?> < <?=$option->per?>) {
           err = '<?=$option->per?> minimum required to book.';
-        } else if(count_<?=$option_num?> > <?=$option->date->availability?>) {
-          err = 'There is not enough availability to book ' + count_<?=$option_num?>;
-        } else if(count_<?=$option_num?> > 150) {
+        } else if(count_<?=$option_num.'_'.$sub_option?> > <?=$option->date->availability?>) {
+          err = 'There is not enough availability to book ' + count_<?=$option_num.'_'.$sub_option?>;
+        } else if(count_<?=$option_num.'_'.$sub_option?> > 150) {
           err = 'You can not book more than 150 spaces in a single booking.';
         }
 				/*
@@ -75,28 +77,21 @@ At least NUM are required.
 				*/
         
         if(err) {
-          $('#error_text_<?=$option_num?>').html(err);
-          $('#error_text_<?=$option_num?>').slideDown().delay(2000).slideUp('slow'); //
+          $('#error_text_<?=$option_num.'_'.$sub_option?>').html(err);
+          $('#error_text_<?=$option_num.'_'.$sub_option?>').slideDown().delay(2000).slideUp('slow'); //
           return false;
         }
       }
     </script>
   		
-      <a data-toggle="collapse" data-parent="#rezgo-select-option-<?=$option_num?>" href="#option_<?=$option_num?>" class="panel-heading panel-title">
-        <div class="rezgo-panel-option col-xs-9"><?=$option->option?>&nbsp;</div>
-        <?php
-					/*if ($site->exists($option->date->hide_availability)) {
-						echo '<div class="rezgo-spot col-xs-3'.($option->date->availability == 0 ? ' rezgo-spot-full' : '').'">'.($option->date->availability == 0 ? '<i class="fa fa-ban"></i>' : '<i class="fa fa-check"></i>').'</div>';
-					} else {
-						echo '<div class="rezgo-spot col-xs-3'.($option->date->availability == 0 ? ' rezgo-spot-full' : '').'">'.$option->date->availability.'</div>';
-					}*/
-				?>
+      <a data-toggle="collapse" data-parent="#rezgo-select-option-<?=$option_num.'_'.$sub_option?>" data-target="#option_<?=$option_num.'_'.$sub_option?>" class="panel-heading panel-title rezgo-panel-option-link">
+        <div class="rezgo-panel-option"><?=utf8_decode($option->option)?>&nbsp;</div>
       </a>
-			<div id="option_<?=$option_num?>" class="panel-collapse collapse<?=((count($options) == 1 && $option_num == 1) ? ' in' : '')/**/?>">
+			<div id="option_<?=$option_num.'_'.$sub_option?>" class="panel-collapse collapse<?=(((count($options) == 1 && $option_num == 1) || $_REQUEST['id'] == (int) $option->uid) ? ' in' : '')?>">
       <div class="panel-body">
 				<? if ($option->date->availability != 0) { ?>
         
-        <form class="rezgo-order-form" name="checkout_<?=$option_num?>" id="checkout_<?=$option_num?>" action="<?=$site->base?>/order">
+        <form class="rezgo-order-form" name="checkout_<?=$option_num.'_'.$sub_option?>" id="checkout_<?=$option_num.'_'.$sub_option?>" action="<?=$site->base?>/order">
           <input type="hidden" name="add[0][uid]" value="<?=$option->uid?>" />
           <input type="hidden" name="add[0][date]" value="<?=$_REQUEST['date']?>" />
 					<? if(!$site->getCartState()) { // for no-cart requests, we want to make sure we clear the cart ?>
@@ -132,20 +127,22 @@ At least NUM are required.
               <? } ?>
             	<div class="clearfix">&nbsp;</div>
               
+              <div class="text-danger rezgo-option-error" id="error_text_<?=$option_num.'_'.$sub_option?>" style="display:none;"></div>
+              
               <? 
 							$total_required = 0;
 							foreach( $prices as $price ) { 
 							?>
-                <script>fields_<?=$option_num?>['<?=$price->name?>_<?=$option_num?>'] = <?=(($price->required) ? 1 : 0)?>;</script>
+                <script>fields_<?=$option_num.'_'.$sub_option?>['<?=$price->name?>_<?=$option_num.'_'.$sub_option?>'] = <?=(($price->required) ? 1 : 0)?>;</script>
                             
                 <div class="form-group row">
                 
                   <div class="col-md-3 col-xs-4 max-80">
-                  	<input type="number" name="add[0][<?=$price->name?>_num]" value="<?=$_REQUEST[$price->name.'_num']?>" id="<?=$price->name?>_<?=$option_num?>" class="form-control input-sm" id="" placeholder="">
+                  	<input type="number" name="add[0][<?=$price->name?>_num]" value="<?=$_REQUEST[$price->name.'_num']?>" id="<?=$price->name?>_<?=$option_num.'_'.$sub_option?>" class="form-control input-sm" id="" placeholder="">
                   </div>
-                  <label for="<?=$price->name?>_<?=$option_num?>" class="col-xs-8 control-label rezgo-label-margin rezgo-label-padding-left">
-                  	x&nbsp;<?=$price->label?><?=(($price->required && $site->getTourRequired()) ? ' <em><i class="fa fa-asterisk"></i></em>' : '')?> 
-                  	(&nbsp;<? if($site->exists($price->base)) { ?><span class="discount"><?=$site->formatCurrency($price->base)?></span> <? } ?><?=$site->formatCurrency($price->price)?>&nbsp;)
+                  <label for="<?=$price->name?>_<?=$option_num.'_'.$sub_option?>" class="col-xs-8 control-label rezgo-label-margin rezgo-label-padding-left">
+                  	x&nbsp;<?=utf8_decode($price->label)?><?=(($price->required && $site->getTourRequired()) ? ' <em><i class="fa fa-asterisk"></i></em>' : '')?> 
+                  	<span class="rezgo-pax-price">(&nbsp;<? if($site->exists($price->base)) { ?><span class="discount"><?=$site->formatCurrency($price->base)?></span> <? } ?><?=$site->formatCurrency($price->price)?>&nbsp;)</span>
                   </label>
                 </div> <!-- //  form-group -->
                              
@@ -154,14 +151,12 @@ At least NUM are required.
 							} // end foreach( $site->getTourPrices()  
 							
 							?>     
-              <script>required_num_<?=$option_num?> = <?=$total_required?>;</script>
-              
-              <div class="text-danger rezgo-option-error" id="error_text_<?=$option_num?>" style="display:none;"></div>
+              <script>required_num_<?=$option_num.'_'.$sub_option?> = <?=$total_required?>;</script>
             
             </div> <!-- end col-sm-8-->
             <div class="col-lg-8 col-md-9 col-xs-12 pull-right">
 	            <? $cart = $site->getCartState(); ?>
-            	<button type="submit" class="btn btn-block rezgo-btn-book btn-lg" onclick="return check_<?=$option_num?>();"><?=(($cart) ? 'Add to Order' : 'Book Now')?></button>
+            	<button type="submit" class="btn btn-block rezgo-btn-book btn-lg" onclick="return check_<?=$option_num.'_'.$sub_option?>();"><?=(($cart) ? 'Add to Order' : 'Book Now')?></button>
             </div>
             
           </div>
@@ -178,8 +173,8 @@ At least NUM are required.
   </div>
 
   <? 
-		
-		$option_num++;
+		$sub_option++; // increment sub option instead
+		//$option_num++;
 		} // end foreach($site->getTours)
 		
 	?>

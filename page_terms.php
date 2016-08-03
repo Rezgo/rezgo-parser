@@ -7,6 +7,8 @@
 	// start a new instance of RezgoSite
 	$site = new RezgoSite();
 	
+	$company = $site->getCompanyDetails();
+	
 ?>
 
 <?=$site->getTemplate('frame_header')?>

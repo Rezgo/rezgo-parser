@@ -23,8 +23,8 @@
   <div class="col-xs-12">
   	<div id="rezgo-cart-list">
       <h4><i class="fa fa-shopping-cart"></i>&nbsp;<span class="hidden-xs">Your Order</span> &ndash;
-      <span><a href="<?=$site->base?>/order"><?=count($cart).' item'.((count($cart) == 1) ? '' : 's')?> in your order. &nbsp;
-      Total:&nbsp;<span><?=$site->formatCurrency($this_order_total)?></span></a></span></h4>
+      <span><a href="<?=$site->base?>/order"><?=count($cart).' item'.((count($cart) == 1) ? '' : 's')?> <span class="hidden-xs">in your order.</span> &nbsp;
+      <span class="hidden-xs">Total:</span>&nbsp;<span><?=$site->formatCurrency($this_order_total)?></span></a></span></h4>
     </div>
   </div><!-- //  mini cart -->
 

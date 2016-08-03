@@ -10,7 +10,7 @@
 		
 			
 		<? if($site->requestStr('search_for') OR $site->requestStr('start_date') OR $site->requestStr('end_date') OR $site->requestStr('tags') OR $site->requestNum('cid')) { ?>
-      <p class="rezgo-list-breadcrumb lead">
+      <p class="rezgo-list-breadcrumb lead wp-hide">
 				Results
 				<? if($site->requestStr('search_for')) { ?> for keyword <a class="rezgo-breadcrumb-link" data-toggle="tooltip" data-placement="top" title="Click to clear keywords" href="<?=$site->base?>/?start_date=<?=$site->requestStr('start_date')?>&end_date=<?=$site->requestStr('end_date')?>&tags=<?=$site->requestStr('tags')?>" target="_top">&quot;<?=stripslashes($site->requestStr('search_for'))?>&quot;</a><? } ?>
 				<? if($site->requestStr('tags')) { ?> tagged with <a class="rezgo-breadcrumb-link" data-toggle="tooltip" data-placement="top" title="Click to clear tags" href="<?=$site->base?>/?start_date=<?=$site->requestStr('start_date')?>&end_date=<?=$site->requestStr('end_date')?>&search_in=<?=$site->requestStr('search_in')?>&search_for=<?=$site->requestStr('search_for')?>" target="_top">&quot;<?=$site->requestStr('tags')?>&quot;</a><? } ?>
@@ -23,7 +23,7 @@
 				 for <a class="rezgo-breadcrumb-link" data-toggle="tooltip" data-placement="top" title="Click to clear date search" href="<?=$site->base?>/?search_in=<?=$site->requestStr('search_in')?>&search_for=<?=$site->requestStr('search_for')?>&tags=<?=$site->requestStr('tags')?>" target="_top"><?=$site->requestStr('end_date')?></a>
 				<? } ?>
 				<a href="<?=$site->base?>/" class="rezgo-list-clear pull-right hidden-xs" target="_top">clear</a>
-        <a href="<?=$site->base?>/" class="rezgo-list-clear-xs hidden-sm hidden-md hidden-lg" target="_top">clear</a>
+        <a href="<?=$site->base?>/" class="rezgo-list-clear-xs pull-right hidden-sm hidden-md hidden-lg" target="_top">clear</a>
       </p>
 		<? } else { ?>
 			<br />
@@ -80,7 +80,7 @@
 							<div class="rezgo-tour-list col-xs-12 pull-left">
 		        <? } ?>
         
-	            <h2 itemprop="name"><a href="<?=$tour_details_link?>" itemprop="url" target="_top"><?=$item->item?></a></h2>		
+	            <h2 itemprop="name"><a href="<?=$tour_details_link?>" itemprop="url" target="_top"><?=utf8_decode($item->item)?></a></h2>		
 		          <p>
 			          <?
 									$text = strip_tags($item->details->overview);
@@ -138,7 +138,7 @@
             <div class="col-xs-12 col-sm-12 col-md-3 pull-right rezgo-more-spacer"></div>
 	            
             <div class="col-xs-12 col-sm-12 col-md-3 pull-right rezgo-detail">
-              <a href="<?=$tour_details_link?>" itemprop="url" class="btn rezgo-btn-detail btn-lg btn-block" target="_top">More details</a>
+              <a href="<?=$tour_details_link?>" itemprop="url" class="btn rezgo-btn-detail btn-lg btn-block" target="_top"><span>More details</span></a>
             </div>
 	            
             <div class="clearfix"></div>

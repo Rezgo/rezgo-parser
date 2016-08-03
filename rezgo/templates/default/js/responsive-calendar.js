@@ -118,10 +118,11 @@
         }
         return _results;
       },
-      setMonth: function(dateString) {
+      setMonthYear: function(dateString) {
         var time;
         time = this.splitDateString(dateString);
-        return this.currentMonth = this.drawDays(time.year, time.month);
+        this.currentMonth = this.drawDays(time.year, time.month);
+        return this.currentYear = time.year;
       },
       prev: function() {
         if (this.currentMonth - 1 < 0) {
@@ -143,6 +144,15 @@
         } else {
           this.currentMonth = this.currentMonth + 1;
         }
+        this.drawDays(this.currentYear, this.currentMonth);
+        if (this.options.onMonthChange) {
+          this.options.onMonthChange.call(this);
+        }
+        return null;
+      },
+      curr: function() {
+        this.currentYear = this.time.getFullYear();
+        this.currentMonth = this.time.getMonth();
         this.drawDays(this.currentYear, this.currentMonth);
         if (this.options.onMonthChange) {
           this.options.onMonthChange.call(this);
@@ -296,16 +306,16 @@
     };
     $.fn.responsiveCalendar = function(option, params) {
       var init, options, publicFunc;
-      if (params == null) {
-        params = void 0;
-      }
       options = $.extend({}, $.fn.responsiveCalendar.defaults, typeof option === 'object' && option);
       publicFunc = {
         next: 'next',
         prev: 'prev',
         edit: 'editDays',
         clear: 'clearDays',
-        clearAll: 'clearAll'
+        clearAll: 'clearAll',
+        getYearMonth: 'getYearMonth',
+        jump: 'jump',
+        curr: 'curr'
       };
       init = function($this) {
         var data;
@@ -333,7 +343,7 @@
           if (publicFunc[option] != null) {
             data[publicFunc[option]](params);
           } else {
-            data.setMonth(option);
+            data.setMonthYear(option);
           }
         } else if (typeof option === 'number') {
           data.jump(Math.abs(option) + 1);

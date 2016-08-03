@@ -63,6 +63,9 @@
 			          <h1 id="rezgo-voucher-tour"><?=$booking->tour_name?></h1>
 			          <h3 id="rezgo-voucher-option"><?=$booking->option_name?><span class="small">&nbsp;&nbsp;(SKU: <?=$item->uid?>)</span></h3>
 			          <h4 id="rezgo-voucher-booking-date"><label>Booked for Date:</label>&nbsp;<?=date((string) $company->date_format, (int) $booking->date)?></h4>
+			          <? if ($booking->time != '') { ?>
+                <h4 id="rezgo-voucher-booking-date"><label>Time:</label>&nbsp;<?=$booking->time?></h4>
+                <? } ?>
 			          <h4 id="rezgo-voucher-created-date"><label>Issued Date:</label>&nbsp;<?=date((string) $company->date_format, (int) $booking->date_purchased_local)?> (local time)</h4>
 			          <h4 id="rezgo-voucher-transnum"><label>Booking Reference:</label>&nbsp;<?=$booking->trans_num?></h4>
 			          <h4 id="rezgo-voucher-contact"><label>Booking Contact:</label>&nbsp;<?=$booking->first_name?> <?=$booking->last_name?></h4>
@@ -72,23 +75,23 @@
 			          <? } ?>
 			          </h4>
 								<? if($site->exists($booking->trigger_code)) { ?>
-			            <h4 id="rezgo-voucher-promocode"><label>Promotional Code:</label>&nbsp;<?=$booking->trigger_code?></h4>
+			            <h4 id="rezgo-voucher-promocode"><label class="rezgo-promo-label"><span>Promotional Code:</span></label>&nbsp;<?=$booking->trigger_code?></h4>
 			          <? } ?>
-			          <p id="rezgo-voucher-paxlist">
+			          <p id="rezgo-voucher-paxlist" class="rezgo-voucher-para">
 								<? foreach( $site->getBookingPassengers() as $passenger ) { ?>
 			            <label><?=$passenger->label?> <?=$passenger->num?>:</label> <?=$passenger->first_name?> <?=$passenger->last_name?><br />
 			          <? } ?>
 			          &nbsp;</p>
-                <div id="rezgo-voucher-pickup">
-                  <p><label>Pickup/Departure:</label></p>
-                  <p><?=htmlspecialchars_decode($item->details->pick_up)?></p>
+                <div id="rezgo-voucher-pickup" class="rezgo-voucher-para">
+                  <label>Pickup/Departure:</label> <br />
+                  <?=$item->details->pick_up?>
                 </div>
-                <div id="rezgo-voucher-dropoff">
-                  <p><label>Dropoff:</label></p>
-                  <p><?=htmlspecialchars_decode($item->details->drop_off)?></p>
+                <div id="rezgo-voucher-dropoff" class="rezgo-voucher-para">
+                  <label>Dropoff:</label> <br />
+                  <?=$item->details->drop_off?>
                 </div>
-                <div id="rezgo-voucher-cancel">
-                  <p><label>Cancellation Policy:</label></p>
+                <div id="rezgo-voucher-cancel" class="rezgo-voucher-para">
+                  <label>Cancellation Policy:</label> <br />
                   <p>
                   <? if($site->exists($booking->rezgo_gateway)) { ?>
                     Canceling a booking with Rezgo can result in cancellation fees being
@@ -192,7 +195,7 @@
 		} else {
 			
 			if ($booking->status == 3) {
-				echo '<div class="col-xs-12"><br />Booking '.$trans_num.' has been cancelled. This action cannot be undone. No voucher will be available for this booking.<br /><br /></div>';
+				echo '<div class="col-xs-12"><br />Booking '.$trans_num.' has been cancelled, voucher is not available.<br /><br /></div>';
 			} else {
 				echo '<div class="col-xs-12"><br />Voucher for Booking '.$trans_num.' is not available until the booking has been confirmed.<br /><br /></div>';
 			}
@@ -200,7 +203,7 @@
 		}
 		
 ?>
-<div class="h6 pull-right"><a href="http://www.rezgo.com/features/online-booking/" title="Powering Tour and Activity Businesses Worldwide" style="color:#333; text-decoration:none;">Online bookings powered by <span style="display: inline-block; width: 65px; text-indent: -9999px; margin-left: 4px; background:url(<?=$site->path?>/img/rezgo-logo.svg) no-repeat; background-size: contain;">Rezgo</span></a></div>
+<div class="h6 pull-right"><a href="http://www.rezgo.com/features/online-booking/" title="Powering Tour and Activity Businesses Worldwide" style="color:#333; text-decoration:none;"><span style="display: inline-block; width: 65px; text-indent: -9999px; margin-left: 4px; background:url(<?=$site->path?>/img/rezgo-logo.svg) no-repeat; background-size: contain;">Rezgo</span></a></div>
 <div class="clearfix"></div>
 
 <?		

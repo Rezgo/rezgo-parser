@@ -5,11 +5,12 @@
 	require('rezgo/include/page_header.php');
 	
 	// start a new instance of RezgoSite
-	$site = new RezgoSite($_REQUEST['sec']);
+	$site = new RezgoSite($_REQUEST['sec'], 1);
 	
 	// remove the 'mode=page_type' from the query string we want to pass on
 	$_SERVER['QUERY_STRING'] = preg_replace("/([&|?])?mode=([a-zA-Z_]+)/", "", $_SERVER['QUERY_STRING']);
 	
+	// set a default page title
 	$site->setPageTitle((($_REQUEST['title']) ? $_REQUEST['title'] : ucwords(str_replace("page_", "", $_REQUEST['mode']))));
 	
 	if($_REQUEST['mode'] == 'page_details') {
@@ -22,26 +23,43 @@
 		$item = $site->getTours('t=com&q='.$_REQUEST['com'].'&f[uid]='.$_REQUEST['option'].'&d='.$_REQUEST['date'].'&limit=1', 0);
 		
 		// if the item does not exist, we want to generate an error message and change the page accordingly
-		if(!$item) { 
+		if(!$item) {
+			$item = new stdClass();
 			$item->unavailable = 1;
 			$item->name = 'Item Not Available'; 
 		}
 		
 		if ($item->seo->seo_title != '') {
-			$site->setPageTitle($item->seo->seo_title);
+			$page_title = $item->seo->seo_title;
 		} else {
-			$site->setPageTitle($item->item);
+			$page_title = $item->item;
 		}
 		
+		if ($item->seo->introduction != '') {
+			$page_description = $item->seo->introduction;
+		} else {
+			$page_description = strip_tags($item->details->overview);
+		}
+		
+		$site->setPageTitle($page_title);
+		
 		$site->setMetaTags('
-			<meta name="description" content="' . $item->seo->introduction . '" /> 
-			<meta property="og:title" content="' . $item->seo->seo_title . '" /> 
-			<meta property="og:description" content="' . $item->seo->introduction . '" /> 
+			<meta name="description" content="' . $page_description . '" /> 
+			<meta property="og:url" content="http://' . $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']  . '" /> 
+			<meta property="og:title" content="' . $page_title . '" /> 
+			<meta property="og:description" content="' . $page_description . '" /> 
 			<meta property="og:image" content="' . $item->media->image[0]->path . '" /> 
 			<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		');
 		
-	} elseif($_REQUEST['mode'] == 'index') {
+		
+	} elseif($_REQUEST['mode'] == 'page_content') {
+		
+		$title = $site->getPageName($page);
+	
+		$site->setPageTitle($title);
+		
+	}	elseif($_REQUEST['mode'] == 'index') {
 		
 		// expand to include keywords and dates
 		$site->setPageTitle((($_REQUEST['tags']) ? ucwords($_REQUEST['tags']) : 'Home'));
@@ -51,7 +69,7 @@
 ?>
 
 <?=$site->getTemplate('header')?>
-
+  
 <script type="text/javascript">
 // for iFrameResize native version
 // MDN PolyFil for IE8 

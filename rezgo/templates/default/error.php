@@ -3,7 +3,7 @@
   <div class="jumbotron">
   
     <h2 id="rezgo-error-head">There was an error with your request <i class="fa fa-exclamation-triangle"></i></h2>
-    <div class="rezgo-cart-wrapper">
+    <div class="rezgo-page-content">
       <p class="lead">
         We are sorry for any inconvenience, but the system encountered an error while handling your request.<br />
         <br />

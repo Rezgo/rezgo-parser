@@ -27,7 +27,7 @@
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDkCWu6MoROFlsRGoqFj-AXPEApsVjyTiA&sensor=false&libraries=places"></script>		
 
-<script type="text/javascript" src="<?=$site->path?>/js/jquery.selectboxes.pack.js"></script>
+<script type="text/javascript" src="<?=$site->path?>/js/jquery.selectboxes.js"></script><!-- .min not working -->
 <script type="text/javascript" src="<?=$site->path?>/js/jquery.validate.min.js"></script>
 
 <? if (isset($captcha_error)) { ?>
@@ -38,8 +38,10 @@
 		var captcha_position = $('#rezgo-scrollto-captcha').position();
 		var captcha_scroll = Math.round(captcha_position.top);
 		
-		if ('parentIFrame' in window) {
-			setTimeout( 'parentIFrame.scrollTo(0,captcha_scroll)', 100 );
+		if ('parentIFrame' in window) {										
+			setTimeout(function () {
+					parentIFrame.scrollTo(0,captcha_scroll);
+			}, 100);										
 		}								
 						
 	});
@@ -58,9 +60,10 @@
 			<script type="text/javascript">
         $(document).ready(function () {
           
-          if ('parentIFrame' in window) {
-            parentIFrame.size();
-						setTimeout( 'parentIFrame.scrollTo(0,0)', 100 );
+          if ('parentIFrame' in window) {		
+						setTimeout(function () {
+								parentIFrame.scrollTo(0,0);
+						}, 100);
           }								
                   
         });
@@ -76,14 +79,14 @@
         <div class="form-group">
           <label for="contact_fullname" class="col-sm-2 control-label">Name</label>
           <div class="col-sm-10">
-          <input type="text" class="form-control" id="contact_fullname" placeholder="Full Name" required="required" name="full_name" value="<?=$_REQUEST['full_name']?>" />
+          <input type="text" class="form-control" id="contact_fullname" placeholder="Full Name" required name="full_name" value="<?=$_REQUEST['full_name']?>" />
           </div>
         </div>
         <div class="form-group">
           <span class="required-group">
           <label for="contact_email" class="col-sm-2 control-label">Email</label>
           <div class="col-sm-4">
-          <input type="email" class="form-control" id="contact_email" placeholder="Email" required="required" name="email" value="<?=$_REQUEST['email']?>" />
+          <input type="email" class="form-control" id="contact_email" placeholder="Email" required name="email" value="<?=$_REQUEST['email']?>" />
 					</div>
           </span>
           <label for="contact_phone" class="col-sm-2 control-label">Phone</label>
@@ -129,7 +132,7 @@
         <div class="form-group">
           <label for="contact_comment" class="col-sm-2 control-label">Comment</label>
           <div class="col-sm-10">
-          <textarea class="form-control" name="body" id="contact_comment" rows="8" wrap="on" required="required"><?=$_REQUEST['body']?></textarea>
+          <textarea class="form-control" name="body" id="contact_comment" rows="8" wrap="on" required><?=$_REQUEST['body']?></textarea>
           <input type="text" name="hp_rezgo" class="hp_rez" value="" />
           </div>
         </div>

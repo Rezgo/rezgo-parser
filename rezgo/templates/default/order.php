@@ -42,13 +42,14 @@ $company = $site->getCompanyDetails();
             <div class="col-lg-9 col-sm-8 col-xs-12 rezgo-cart-title">
               <h3>
                 <a href="<?=$site->base?>/details/<?=$item->com?>/<?=$site->seoEncode($item->item)?>">
-									<?=$item->item?> &mdash; <?=$item->option?>			
+									<?=utf8_decode($item->item)?> &mdash; <?=utf8_decode($item->option)?>			
                 </a>							
 							</h3>
               <label>Date: <span class="lead"><?=date((string) $company->date_format, (string) $item->booking_date)?></span></label>
               <? 
 	              if($item->discount_rules->rule) {
-              		echo '<br><label>Discount: ';
+              		echo '<br><label class="rezgo-booking-discount">
+									<span class="rezgo-discount-span">Discount:</span> ';
               		unset($discount_string);
 									foreach($item->discount_rules->rule as $discount) {	
               			$discount_string .= ($discount_string) ? ', '.$discount : $discount;
@@ -58,16 +59,16 @@ $company = $site->getCompanyDetails();
               	} 
               ?>
             </div>
+            <? if($site->getCartState()) { ?>
             <div class="col-lg-3 col-sm-4 col-xs-12">
               <div class="col-sm-12 rezgo-btn-cart-wrp">
-              <button type="button" data-toggle="collapse" class="btn rezgo-btn-default btn-block rezgo-pax-edit-btn" data-order-item="<?=$item->uid?>" data-order-com="<?=$item->com?>" data-cart-id="<?=$item->cartID?>" data-book-date="<?=date("Y-m-d", (string)$item->booking_date)?>" href="#pax-edit-<?=$item->cartID?>">Edit Guests</button>        
+              <button type="button" data-toggle="collapse" class="btn rezgo-btn-default btn-block rezgo-pax-edit-btn" data-order-item="<?=$item->uid?>" data-order-com="<?=$item->com?>" data-cart-id="<?=$item->cartID?>" data-book-date="<?=date("Y-m-d", (string)$item->booking_date)?>" data-target="#pax-edit-<?=$item->cartID?>">Edit Guests</button>        
               </div>
-              <? if($site->getCartState()) { ?>
               <div class="col-sm-12 rezgo-btn-cart-wrp">
               <button type="button" class="btn rezgo-btn-remove btn-block" onclick="top.location.href='<?=$site->base?>/order?edit[<?=$item->cartID?>][adult_num]=0';">Remove from Order</button>
               </div>
-              <? } ?>
             </div>
+            <? } ?>
         </div>
         <div class="row rezgo-form-group" id="rezgo-cart-pricing-<?=$item->uid?>">  
           <div class="col-sm-12">
@@ -84,7 +85,7 @@ $company = $site->getCompanyDetails();
               <? foreach( $site->getTourPrices($item) as $price ) { ?>
                <? if($item->{$price->name.'_num'}) { ?>
                   <tr>
-                    <td class="text-right"><?=$price->label?></td>
+                    <td class="text-right"><?=utf8_decode($price->label)?></td>
                     <td class="text-right"><?=$item->{$price->name.'_num'}?></td>
                     <td class="text-right">
                       <? if($site->exists($price->base)) { ?><span class="discount"><?=$site->formatCurrency($price->base)?></span><? } ?>
@@ -153,14 +154,14 @@ $company = $site->getCompanyDetails();
         <div class="row rezgo-form-group-short">
         <? if (!$_SESSION['rezgo_promo']) { ?>
           <form class="form-inline" id="rezgo-promo-form" role="form" onsubmit="top.location.href = '/order?promo=' + $('#rezgo-promo-code').val(); return false;">
-            <label for="rezgo-promo-code"><i class="fa fa-tags"></i>&nbsp;Promo code</label>&nbsp;
+            <label for="rezgo-promo-code"><i class="fa fa-tags"></i>&nbsp;<span class="rezgo-promo-label"><span>Promo code</span></span></label>&nbsp;
             <div class="input-group">
             <input type="text" class="form-control" id="rezgo-promo-code" name="promo" placeholder="Enter Promo Code" value="<?=($_SESSION['rezgo_promo'] ? $_SESSION['rezgo_promo'] : '')?>" />
             <span class="input-group-btn"><button class="btn rezgo-btn-default" type="submit">Apply</button></span>
             </div>
           </form>
         <? } else { ?>
-          <label for="rezgo-promo-code"><i class="fa fa-tags"></i>&nbsp;Entered promo code:</label>&nbsp;
+          <label for="rezgo-promo-code"><i class="fa fa-tags"></i>&nbsp;<span class="rezgo-promo-label"><span>Promo code:</span></span></label>&nbsp;
         	<span id="rezgo-promo-value"><?=$_SESSION['rezgo_promo']?></span>&nbsp;
           <a id="rezgo-promo-clear" class="btn rezgo-btn-default btn-sm" href="/order?promo=" target="_top">clear</a>
         <? } ?>
@@ -168,7 +169,7 @@ $company = $site->getCompanyDetails();
       <? } ?>
     
       <div class="row">
-        <div class="col-sm-12 col-sm-offset-0 col-md-6 col-md-offset-6 rezgo-order-total">Current <span class="hidden-xs">Order</span> Total <?=$site->formatCurrency($cart_total)?></div>
+        <div class="col-sm-12 col-sm-offset-0 col-md-6 col-md-offset-6 rezgo-order-total"><span class="hidden-xs">Current Order</span> Total <?=$site->formatCurrency($cart_total)?></div>
       </div>
       
       <div class="row" id="rezgo-booking-btn">
@@ -286,7 +287,9 @@ $company = $site->getCompanyDetails();
 				var pax_edit_scroll = Math.round(pax_edit_position.top);
 				
 				if ('parentIFrame' in window) {
-					setTimeout( 'parentIFrame.scrollTo(0,pax_edit_scroll)', 100 );
+					setTimeout(function () {
+							parentIFrame.scrollTo(0,pax_edit_scroll);
+					}, 100);										
 				}					
 				
 			});			

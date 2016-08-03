@@ -61,8 +61,8 @@ function Barcode39 ($barcode, $width, $height, $quality, $format, $text)
         $WideRatio = 55;
         $QuietRatio = 35;
 
-
-        $nChars = (strlen($barcode)+2) * ((6 * $NarrowRatio) + (3 * $WideRatio) + ($QuietRatio));
+				// +2 // removed char padding for longer voucher numbers
+        $nChars = (strlen($barcode)) * ((6 * $NarrowRatio) + (3 * $WideRatio) + ($QuietRatio));
         $Pixels = $width / $nChars;
         $NarrowBar = (int)(20 * $Pixels);
         $WideBar = (int)(55 * $Pixels);

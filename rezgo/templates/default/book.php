@@ -10,12 +10,18 @@
 	}
 	
 	$company = $site->getCompanyDetails();
+	$companyCountry = $site->getCompanyCountry();
 	
 ?>
 
 <script type="text/javascript" src="<?=$site->path?>/js/jquery.form.js"></script><!-- ajaxSubmit -->
 <script type="text/javascript" src="<?=$site->path?>/js/jquery.validate.min.js"></script>
-<script type="text/javascript" src="<?=$site->path?>/js/jquery.selectboxes.pack.js"></script>
+<script type="text/javascript" src="<?=$site->path?>/js/jquery.selectboxes.js"></script><!-- .min not working -->
+
+<!-- international phone input -->	
+<link rel="stylesheet" href="<?=$site->path?>/css/intlTelInput.css" />
+<script src="<?=$site->path?>/js/intlTelInput/intlTelInput.js"></script>
+
 		
 <script>
 	var elements = new Array();
@@ -72,6 +78,8 @@
 		} else {
 			if(document.getElementById('element_' + order_num + '_' + id).style.display == 'none') document.getElementById('element_' + order_num + '_' + id).style.display = '';
 			$("#val_" + order_num + "_" + id).html(display_price);
+			$("#val_" + order_num + "_" + id).show();
+			//document.getElementById('val_' + order_num + '_' + id).innerHTML = display_price;
 		}	
 		elements[order_num][id] = price;
 		
@@ -116,6 +124,7 @@
 		
 		if(price == 0) {	
 			document.getElementById('element_' + order_num + '_' + id).style.display = 'none';
+			document.getElementById('val_' + order_num + '_' + id).style.display = 'none';
 		} else {
 			document.getElementById('val_' + order_num + '_' + id).innerHTML = display_price;
 		}	
@@ -149,6 +158,23 @@
 <script>
 	
 	$(document).ready(function() {	
+		
+		// start international phone input
+		
+		$("#tour_sms").intlTelInput({ 
+			initialCountry: '<?=$companyCountry?>',
+			formatOnInit: true,
+			preferredCountries: ['us', 'ca', 'gb', 'au'],
+			//nationalMode: false,
+			utilsScript: '<?=$site->path?>/js/intlTelInput/utils.js'
+		});
+		
+		$("#tour_sms").on("keyup change blur countrychange", function() {
+		  $('#sms').val($("#tour_sms").intlTelInput("getNumber"));
+			//window.console.log('sms: ' + $("#tour_sms").intlTelInput("getNumber"));
+		});
+	
+		// end international phone input
 	
 		$.validator.setDefaults({
 				highlight: function(element) {
@@ -321,12 +347,12 @@ if (!Array.prototype.forEach){
     <?=$item->item?> &mdash; <?=$item->option?></h3>
     <h4><?=date((string) $company->date_format, (string)$item->booking_date)?></h4>
 		<? /*if($_COOKIE['rezgo_promo']) { ?>
-    <h4>Promotional Code: <?=$_COOKIE['rezgo_promo']?></h4>
+    <h4><span class="rezgo-promo-label"><span>Promotional Code:</span></span> <?=$_COOKIE['rezgo_promo']?></h4>
     <? }*/ ?>
     
 		<? 
       if($item->discount_rules->rule) {
-        echo '<h4>Discount: ';
+        echo '<h4 class="rezgo-booking-discount"><span class="rezgo-discount-span">Discount:</span> ';
         unset($discount_string);
         foreach($item->discount_rules->rule as $discount) {	
           $discount_string .= ($discount_string) ? ', '.$discount : $discount;
@@ -349,29 +375,31 @@ if (!Array.prototype.forEach){
       <div class="row rezgo-form-group">
       
         <div class="col-sm-12 rezgo-sub-title"><?=$price->label?> (<?=$num?>)</div>
-        <div class="rezgo-form-row rezgo-form-one form-group">
+        <div class="rezgo-form-row rezgo-form-one form-group rezgo-pax-first-last">
           
-          <label for="frm_<?=$c?>_<?=$price->name?>_<?=$num?>_first_name" class="col-sm-2 control-label rezgo-label-right">First&nbsp;Name<? if($item->group == 'require') { ?>&nbsp;<em class="fa fa-asterisk"></em><? } ?></label>
+          <label for="frm_<?=$c?>_<?=$price->name?>_<?=$num?>_first_name" class="col-sm-2 control-label rezgo-label-right">First&nbsp;Name<? if($item->group == 'require' || $item->group == 'require_name') { ?>&nbsp;<em class="fa fa-asterisk"></em><? } ?></label>
           <div class="col-sm-4 rezgo-form-input">
-          <input type="text" class="form-control<? echo ($item->group == 'require') ? ' required' : ''; ?>" id="frm_<?=$c?>_<?=$price->name?>_<?=$num?>_first_name" name="booking[<?=$c?>][tour_group][<?=$price->name?>][<?=$num?>][first_name]" /> 
+          <input type="text" class="form-control<? echo ($item->group == 'require' || $item->group == 'require_name') ? ' required' : ''; ?>" id="frm_<?=$c?>_<?=$price->name?>_<?=$num?>_first_name" name="booking[<?=$c?>][tour_group][<?=$price->name?>][<?=$num?>][first_name]" /> 
           </div>
         
-          <label for="frm_<?=$c?>_<?=$price->name?>_<?=$num?>_last_name" class="col-sm-2 control-label rezgo-label-right">Last&nbsp;Name<? if($item->group == 'require') { ?>&nbsp;<em class="fa fa-asterisk"></em><? } ?></label>
+          <label for="frm_<?=$c?>_<?=$price->name?>_<?=$num?>_last_name" class="col-sm-2 control-label rezgo-label-right">Last&nbsp;Name<? if($item->group == 'require' || $item->group == 'require_name') { ?>&nbsp;<em class="fa fa-asterisk"></em><? } ?></label>
           <div class="col-sm-4 rezgo-form-input">
-          <input type="text" class="form-control<? echo ($item->group == 'require') ? ' required' : ''; ?>" id="frm_<?=$c?>_<?=$price->name?>_<?=$num?>_last_name" name="booking[<?=$c?>][tour_group][<?=$price->name?>][<?=$num?>][last_name]" />
+          <input type="text" class="form-control<? echo ($item->group == 'require' || $item->group == 'require_name') ? ' required' : ''; ?>" id="frm_<?=$c?>_<?=$price->name?>_<?=$num?>_last_name" name="booking[<?=$c?>][tour_group][<?=$price->name?>][<?=$num?>][last_name]" />
           </div>
           
         </div>
-        <div class="rezgo-form-row rezgo-form-one form-group">
-          <label for="frm_<?=$c?>_<?=$price->name?>_<?=$num?>_phone" class="col-sm-2 control-label rezgo-label-right">Phone</label>
+        <? if ($item->group != 'request_name') { ?>
+        <div class="rezgo-form-row rezgo-form-one form-group rezgo-pax-phone-email">
+          <label for="frm_<?=$c?>_<?=$price->name?>_<?=$num?>_phone" class="col-sm-2 control-label rezgo-label-right">Phone<? if($item->group == 'require') { ?>&nbsp;<em class="fa fa-asterisk"></em><? } ?></label>
           <div class="col-sm-4 rezgo-form-input">
-          <input type="text" class="form-control" id="frm_<?=$c?>_<?=$price->name?>_<?=$num?>_phone" name="booking[<?=$c?>][tour_group][<?=$price->name?>][<?=$num?>][phone]" />
+          <input type="text" class="form-control<? echo ($item->group == 'require') ? ' required' : ''; ?>" id="frm_<?=$c?>_<?=$price->name?>_<?=$num?>_phone" name="booking[<?=$c?>][tour_group][<?=$price->name?>][<?=$num?>][phone]" />
           </div>
-          <label for="frm_<?=$c?>_<?=$price->name?>_<?=$num?>_email" class="col-sm-2 control-label rezgo-label-right">Email</label>
+          <label for="frm_<?=$c?>_<?=$price->name?>_<?=$num?>_email" class="col-sm-2 control-label rezgo-label-right">Email<? if($item->group == 'require') { ?>&nbsp;<em class="fa fa-asterisk"></em><? } ?></label>
           <div class="col-sm-4 rezgo-form-input">
-          <input type="email" class="form-control" id="frm_<?=$c?>_<?=$price->name?>_<?=$num?>_email" name="booking[<?=$c?>][tour_group][<?=$price->name?>][<?=$num?>][email]" />
+          <input type="email" class="form-control<? echo ($item->group == 'require') ? ' required' : ''; ?>" id="frm_<?=$c?>_<?=$price->name?>_<?=$num?>_email" name="booking[<?=$c?>][tour_group][<?=$price->name?>][<?=$num?>][email]" />
           </div>
         </div>
+        <? } ?>
         
         <? $form_counter = 1; // form counter to create unique IDs ?>
         
@@ -600,6 +628,28 @@ if (!Array.prototype.forEach){
 	<script>
     $(document).ready(function () {
       $('.rezgo-cart-count').text('<?=$cart_count?>');
+			
+			// copy info from first pax to billing fields
+			$( "#rezgo-copy-pax" ).click(function() {
+				
+				if ($(this).prop("checked") == true) {
+						
+					$('#tour_first_name').val($('#frm_1_adult_1_first_name').val());
+					$('#tour_last_name').val($('#frm_1_adult_1_last_name').val());
+					$('#tour_email_address').val($('#frm_1_adult_1_email').val());
+					$('#tour_phone_number').val($('#frm_1_adult_1_phone').val());
+
+				} else if ($(this).prop("checked") == false) {
+						
+					$('#tour_first_name').val('');
+					$('#tour_last_name').val('');
+					$('#tour_email_address').val('');
+					$('#tour_phone_number').val('');
+
+				}				
+				
+			});	
+			
     });
   </script>
 
@@ -649,7 +699,8 @@ if (!Array.prototype.forEach){
             <? } ?>
             <? 
               if($item->discount_rules->rule) {
-            		echo '<tr><td class="rezgo-td-label">Discount:</td>
+            		echo '<tr><td class="rezgo-td-label rezgo-booking-discount">
+								<span class="rezgo-discount-span">Discount:</span></td>
             		<td class="rezgo-td-data">';
             		unset($discount_string);
 								foreach($item->discount_rules->rule as $discount) {	
@@ -764,7 +815,10 @@ if (!Array.prototype.forEach){
     <div class="row rezgo-form-group rezgo-booking">
       
       <div class="col-xs-12">
-        <h3 class="text-info">Billing Information</h3>
+        <h3 class="text-info">Billing Information &nbsp; 
+        <span id="rezgo-copy-pax-span" style="display:none"><br class="visible-xs-inline"/><input type="checkbox" name="copy_pax" id="rezgo-copy-pax" />
+        <span id="rezgo-copy-pax-desc" class="rezgo-memo">Use first passenger information</span></span>
+        </h3>
         <div class="form-group">
           <label for="tour_first_name" class="control-label">Name</label>
           <div class="rezgo-form-row">
@@ -797,7 +851,6 @@ if (!Array.prototype.forEach){
           </div>
           <div class="rezgo-form-row">
             <div class="col-sm-8 col-xs-12 rezgo-form-input">
-						<? $companyCountry = $site->getCompanyCountry(); ?>
             <select name="tour_country" id="tour_country" class="form-control">
               <? foreach( $site->getRegionList() as $iso => $name ) { ?>
                 <option value="<?=$iso?>" <?=(($iso == $companyCountry) ? 'selected' : '')?>><?=ucwords($name)?></option>
@@ -824,6 +877,30 @@ if (!Array.prototype.forEach){
             <div class="col-sm-6 col-xs-12 rezgo-form-input"><input type="text" class="form-control" id="tour_phone_number" name="tour_phone_number" /></div>
           </div>
         </div>       
+        
+        <div class="form-group">
+          <div class="rezgo-form-row">
+            <div class="col-sm-12 rezgo-sms">
+              Would you like to receive SMS messages regarding your booking? 
+              If so, please enter your mobile number in the space provided. 
+              Please note that your provider may charge additional fees. 
+            </div>
+          </div>
+        </div>      
+        
+        <div class="form-group">
+          <div class="rezgo-form-row">
+            <label for="tour_sms" class="control-label col-sm-12 rezgo-form-label">SMS</label>
+          </div>
+          <div class="rezgo-form-row">
+            <div class="col-sm-12 rezgo-form-input">
+						<input type="text" name="tour_sms" id="tour_sms" class="form-control col-xs-12" value="" />
+						<input type="hidden" name="sms" id="sms" value="" />
+            </div>
+          </div>
+        </div>  
+        
+        
         
       </div>
       <!-- // left side billing frame -->
@@ -931,11 +1008,17 @@ if (!Array.prototype.forEach){
           	<div class="checkbox">
             <label id="rezgo-terms-label">
               <input type="checkbox" id="agree_terms" name="agree_terms" value="1" /><!-- style="margin-top:7px;"-->
-              I agree to the <a data-toggle="collapse" class="collapsed" id="rezgo-terms-link" href="#rezgo-terms-panel">Terms and Conditions</a>
+              I agree to the <a data-toggle="collapse" class="collapsed" id="rezgo-terms-link" data-target="#rezgo-terms-panel">Terms and Conditions</a>
             </label>
             </div>              
             <div id="rezgo-terms-panel" class="collapse">
               <?=$site->getPageContent('terms')?>
+							<?php
+               if ($company->tripadvisor_url != '') {
+                echo '<p class="rezgo-ta-privacy">Privacy Addendum <br />
+                We may use third-party service providers such as TripAdvisor to process your personal information on our behalf. For example, we may share some information about you with these third parties so that they can contact you directly by email (for example: to obtain post visit reviews about your experience).</p>';
+               }
+              ?>
             </div>
           </div>
           <hr />
@@ -991,7 +1074,9 @@ if (!Array.prototype.forEach){
  
 </div><!-- //  .container -->
 
-
+<style>
+#debug_response { width:100%; height:200px; }
+</style>
 <script>
 	var toComplete = 0;
 	var response; // needs to be global to work in timeout
@@ -1009,6 +1094,9 @@ if (!Array.prototype.forEach){
 	
 	$('#tour_country').change(function() {
 		var country = $(this).val();
+		
+		// set SMS country 
+		$("#tour_sms").intlTelInput("setCountry", $(this).val());
 		
 		$('#tour_stateprov').removeOption(/.*/);
 		switch (country) {
@@ -1050,7 +1138,7 @@ if (!Array.prototype.forEach){
 	    return this.replace(/^\s+/, '').replace(/\s+$/, '');
 	  };
 	}
-	
+		
 	// change the modal dialog box or pass the user to the receipt depending on the response
 	function show_response()  {
 		
@@ -1085,7 +1173,7 @@ if (!Array.prototype.forEach){
 					split[1] = '<div class="clearfix">&nbsp;</div>BOOKING COMPLETED WITHOUT ERRORS<div class="clearfix">&nbsp;</div><button type="button" class="btn btn-default" onclick="window.location.replace(\'<?=$site->base?>/complete/' + split[1] + '\');">Continue to Receipt</button><div class="clearfix">&nbsp;</div>';
 				}
 			
-				var body = 'DEBUG-STOP ENCOUNTERED<br /><br />' + split[0] + split[1];
+				var body = 'DEBUG-STOP ENCOUNTERED<br /><br />' + '<textarea id="debug_response">' + split[0] + '</textarea>' + split[1];
 			} else {
 				// send the user to the receipt page
 				top.location.replace("<?=$site->base?>/complete/" + response);
@@ -1101,7 +1189,9 @@ if (!Array.prototype.forEach){
 	// this function delays the output so we see the loading graphic
 	function delay_response(responseText) {
 		response = responseText;
-		setTimeout('show_response();', 800);
+		setTimeout(function () {
+				show_response();
+		}, 800);										
 	}
 	
 	function validate_form() {
@@ -1115,8 +1205,10 @@ if (!Array.prototype.forEach){
 		$('#rezgo-book-errors').fadeIn();
 		// revisit when scroll resolved
 		//$.scrollTo('#error_scrollto', 200);
-		// moved to unhighlight
-		setTimeout("$('#rezgo-book-errors').fadeOut();", 5000);
+		// moved to unhighlight										
+		setTimeout(function () {
+				$('#rezgo-book-errors').fadeOut();
+		}, 5000);										
 		return false;
 	}
 	
@@ -1250,9 +1342,16 @@ if (!Array.prototype.forEach){
 		var step_two_position = $('#step_two_scrollto').position();
 		var step_two_scroll = Math.round(step_two_position.top);
 		
-		if ('parentIFrame' in window) {
-			setTimeout( 'parentIFrame.scrollTo(0,0)', 100 );
-		}								
+		if ('parentIFrame' in window) {										
+			setTimeout(function () {
+					parentIFrame.scrollTo(0,0);
+			}, 100);										
+		}			
+		
+		// show copy pax checkbox if we have pax info
+		if ($('#frm_1_adult_1_first_name').val()) {
+			$('#rezgo-copy-pax-span').show();
+		}
 				
 		$('#rezgo-book-errors').fadeOut();
 			
@@ -1292,7 +1391,9 @@ if (!Array.prototype.forEach){
 		$("#agree_terms").removeClass("required");
 		
 		if ('parentIFrame' in window) {
-			setTimeout( 'parentIFrame.scrollTo(0,0)', 100 );
+				setTimeout(function () {
+						parentIFrame.scrollTo(0,0);
+				}, 100);										
 		}								
 		
 	}

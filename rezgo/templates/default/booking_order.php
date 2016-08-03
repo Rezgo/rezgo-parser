@@ -18,6 +18,12 @@
 	
 	$company = $site->getCompanyDetails();
 	
+
+	// unset promo session and cookie
+	unset($_REQUEST['promo']);
+	unset($_SESSION['rezgo_promo']);
+	// set no value, expire an hour ago
+	setcookie("rezgo_promo", " ", time() - 3600, '/', $_SERVER['SERVER_NAME']); 
 ?>
 
 
@@ -48,12 +54,16 @@
 	
 	<? foreach( $order_bookings as $booking ) { ?>
   
-		<? $item = $site->getTours('t=uid&q='.$booking->item_id, 0); ?>
+		<? 
+		$item = $site->getTours('t=uid&q='.$booking->item_id, 0); 
+		$share_url = urlencode('http://'.$_SERVER['HTTP_HOST'].$site->base.'/details/'.$item->com.'/'.$site->seoEncode($item->item));
+		?>
 		
 		<? $site->readItem($booking); ?>
 	  
     <div class="row rezgo-form-group rezgo-confirmation"> 
-      <div class="rezgo-booking-status">
+      
+      <div class="rezgo-booking-status col-md-4 col-sm-12">
       <!-- Booking <?=$n++?> of <?=count($order_bookings)?> (booked on <?=date((string) $company->date_format, (int) $booking->date_purchased_local)?> / local time) -->
 			<? if($booking->status == 1 OR $booking->status == 4) { ?>
         <p class="rezgo-status-complete"><i class="fa fa-check fa-lg"></i>&nbsp;Booking Complete</p>
@@ -104,6 +114,19 @@
       <? } ?>
       
       </div><!-- // .rezgo-booking-status -->
+      
+      <div class="col-md-8 col-sm-12">
+        
+        <div class="rezgo-booking-share">
+          <span id="rezgo-social-links">       
+            <a href="javascript:void(0);" title="Share this on Twitter" id="social_twitter" onclick="window.open('http://twitter.com/share?text=<?=urlencode('I found this great thing to do! "'.$item->item.'"')?>&url=<?=$share_url?><? if($site->exists($site->getTwitterName())) { ?>&via=<?=$site->getTwitterName()?>'<? } else {?>'<? } ?>,'tweet','location=1,status=1,scrollbars=1,width=500,height=350');"><i class="fa fa-twitter-square" id="social_twitter_icon">&nbsp;</i></a>
+            <a href="javascript:void(0);" title="Share this on Facebook" id="social_facebook" onclick="window.open('http://www.facebook.com/sharer.php?u=<?=$share_url?>&t=<?=urlencode($item->item)?>','facebook','location=1,status=1,scrollbars=1,width=600,height=400');"><i class="fa fa-facebook-square" id="social_facebook_icon">&nbsp;</i></a>
+          </span>		      
+        </div>
+        
+      </div>
+      
+      <div class="clearfix"></div>
             
       <h3><?=$booking->tour_name?>&nbsp;(<?=$booking->option_name?>)</h3>
       <div class="col-md-4 col-sm-12">
@@ -115,11 +138,13 @@
           </tr>
           <tr>
             <td class="rezgo-td-label">Date:</td>
-            <td class="rezgo-td-data"><?=date((string) $company->date_format, (int) $booking->date)?></td>
+            <td class="rezgo-td-data"><?=date((string) $company->date_format, (int) $booking->date)?>
+            <? if ($booking->time != '') { ?> at <?=$booking->time?><? } ?>
+            </td>
           </tr>
           <? if($site->exists($booking->trigger_code)) { ?>
           <tr>
-            <td class="rezgo-td-label">Promotional&nbsp;Code:</td>
+            <td class="rezgo-td-label" class="rezgo-promo-label"><span>Promotional&nbsp;Code:</span></td>
             <td class="rezgo-td-data"><?=$booking->trigger_code?></td>
           </tr>
           <? } ?>
@@ -223,6 +248,7 @@
           </table>
         </table>
       </div>
+
     </div>
     <!-- //  tour confirm --> 
 	          
@@ -248,7 +274,8 @@
           </tr>
           <tr>
             <td class="rezgo-td-label">Address:</td>
-            <td class="rezgo-td-data"><?=$booking->address_1?> <?=$booking->address_2?> <?=$booking->city?> <?=$booking->stateprov?> <?=$booking->country?> <?=$booking->postal_code?></td>
+            <td class="rezgo-td-data"><?=$booking->address_1?><? if($site->exists($booking->address_2)) { ?>, <?=$booking->address_2?><? } ?><? if($site->exists($booking->city)) { ?>, <?=$booking->city?><? } ?><? if($site->exists($booking->stateprov)) { ?>, <?=$booking->stateprov?><? } ?><? if($site->exists($booking->postal_code)) { ?>, <?=$booking->postal_code?><? } ?>, <?=$site->countryName($booking->country)?>
+            </td>
           </tr>
           <tr>
             <td class="rezgo-td-label">Phone&nbsp;No.:</td>
@@ -287,31 +314,9 @@
   </div><!-- //  .jumbotron --> 
 </div>
 
-<? if($_SESSION['REZGO_CONVERSION_ANALYTICS']) { ?>
-	
-	<?=$_SESSION['REZGO_CONVERSION_ANALYTICS']?>
-			
-	<!-- HitsLink.com tracking script -->
-	<script type="text/javascript" id="wa_u" defer></script>
-	<script type="text/javascript" async>//<![CDATA[
-	var wa_pageName=location.pathname;    // customize the page name here;
-	wa_account="C6CFCDCACDCFC7CBCDCB"; wa_location=93;
-	wa_MultivariateKey = '';    //  Set this variable to perform multivariate testing
-	ec_Orders_orderID='<?=$trans_num?>';      //  Enter the Orders unique ID
-	ec_Orders_orderAmt='<?=$cart_total?>';  //  Enter the amount of the Orders
-	var wa_c=new RegExp('__wa_v=([^;]+)').exec(document.cookie),wa_tz=new Date(),
-	wa_rf=document.referrer,wa_sr=location.search,wa_hp='http'+(location.protocol=='https:'?'s':'');
-	if(top!==self){wa_rf=top.document.referrer;wa_sr=top.location.search}
-	if(wa_c!=null){wa_c=wa_c[1]}else{wa_c=wa_tz.getTime();
-	document.cookie='__wa_v='+wa_c+';path=/;expires=1/1/'+(wa_tz.getUTCFullYear()+2);}wa_img=new Image();
-	wa_img.src=wa_hp+'://counter.hitslink.com/statistics.asp?v=1&s=93&eacct='+wa_account+'&an='+
-	escape(navigator.appName)+'&sr='+escape(wa_sr)+'&rf='+escape(wa_rf)+'&mvk='+escape(wa_MultivariateKey)+
-	'&sl='+escape(navigator.systemLanguage)+'&l='+escape(navigator.language)+
-	'&pf='+escape(navigator.platform)+'&pg='+escape(wa_pageName)+'&cd='+screen.colorDepth+'&rs='+escape(screen.width+
-	' x '+screen.height)+'&je='+navigator.javaEnabled()+'&c='+wa_c+'&tks='+wa_tz.getTime()
-	+'&ec_type=111133&ec_uniqueId='+ec_Orders_orderID+'&ec_orderAmount='+ec_Orders_orderAmt
-	;document.getElementById('wa_u').src=wa_hp+'://counter.hitslink.com/track.js';//]]>
-	</script>
-	
-	<? unset($_SESSION['REZGO_CONVERSION_ANALYTICS']); ?>
-<? } ?>
+<? 
+	if($_SESSION['REZGO_CONVERSION_ANALYTICS']) { 
+		echo $_SESSION['REZGO_CONVERSION_ANALYTICS'];
+		unset($_SESSION['REZGO_CONVERSION_ANALYTICS']);
+	} 
+?>

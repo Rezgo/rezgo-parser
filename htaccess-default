@@ -3,7 +3,28 @@
 # -------------------------------------------------
 ErrorDocument 404 /frame.php?mode=page_404&title=Page+not+found
 
+# -------------------------------------------------
+# Add MIME types for video uploads
+# -------------------------------------------------
+
+# AddType video/webm .webm
+# AddType video/mp4 .mp4
+# AddType video/ogg .ogv
+
+AddType video/mp4 mp4 m4v
+AddType audio/mp4 m4a
+AddType video/ogg ogv
+AddType audio/ogg ogg oga
+AddType video/webm webm
+
 RewriteEngine on
+
+# -------------------------------------------------
+# Signup page
+# -------------------------------------------------
+
+RewriteRule ^signup/?$ /signup/signup.php [QSA]
+RewriteRule ^signup/([^.]+)/?$ /signup/signup_success.php?email=$1 [QSA]
 
 # -------------------------------------------------
 # Rules for the new parser addresses
@@ -11,6 +32,13 @@ RewriteEngine on
 
 # root page
 RewriteRule ^/?$ /frame.php?mode=index [QSA]
+
+# bounce for old content pages to new locations
+RewriteRule ^content/([^.]+)(.php)?$ /$1 [L,R=301]
+
+# bounce for old tour pages to details pages
+RewriteRule ^tour/([0-9]+)/([^\/]+)/?$ /details/$1/$2 [L,QSA,R=301]
+RewriteRule ^tour/([0-9]+)/([^\/]+)/([0-9]+)/([^\/]+)/?$ /details/$1/$2/$3/$4 [L,QSA,R=301]
 
 # pre made content pages
 RewriteRule ^contact/?$ /frame.php?mode=page_contact&title=Contact+Us [QSA]
@@ -42,6 +70,13 @@ RewriteRule ^complete/([^\/]*)/?$ /frame.php?mode=booking_complete&trans_num=$1&
 
 # voucher page
 RewriteRule ^voucher/([^\/]*)/?$ /booking_voucher.php?trans_num=$1&title=Booking+Voucher [QSA]
+RewriteRule ^voucher/([^\/]*)/pdf/?$ /booking_voucher_pdf.php?trans_num=$1&title=Booking+Voucher [QSA]
+
+# summary page (for back-end use)
+RewriteRule ^summary/([^\/]*)/?$ /booking_summary.php?trans_num=$1&title=Booking+Summary [QSA]
+
+# cookie policy for EU suppliers
+RewriteRule ^cookie-policy/?$ /frame.php?mode=page_cookies&title=Cookie+Policy [QSA]
 
 # dynamic robots.txt
 RewriteRule ^robots\.txt$ /robots.php

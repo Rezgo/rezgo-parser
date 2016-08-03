@@ -10,11 +10,12 @@
 	$company = $site->getCompanyDetails();
 	
 ?>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDkCWu6MoROFlsRGoqFj-AXPEApsVjyTiA&libraries=places"></script>		
 
 <div class="container-fluid rezgo-container">
   <div class="jumbotron rezgo-booking">
     <? if(!$site->getBookings('q='.$trans_num)) { $site->sendTo("/booking-not-found:".$_REQUEST['trans_num']); } ?>
-    <? foreach( $site->getBookings('q='.$trans_num) as $booking ): ?>
+    <? foreach( $site->getBookings('q='.$trans_num) as $booking ) { ?>
     <? $item = $site->getTours('t=uid&q='.$booking->item_id, 0); ?>
     <? $site->readItem($booking); ?>
         
@@ -32,12 +33,13 @@
     <!-- // breadcrumb-->
     <div class="row rezgo-confirmation-head">
       <? if($booking->status == 1 OR $booking->status == 4) { ?>
-      <h3>BOOKING COMPLETE</h3>
-      <p>Click on the button below for your printable voucher.</p>
+      <h3 class="rezgo-confirm-complete"><span>BOOKING COMPLETE</span></h3>
+      <p class="rezgo-confirm-complete"><span>Click on the button below for your printable voucher.</span></p>
       <? } ?>
       <? if($booking->status == 2) { ?>
-      <h3>BOOKING NOT YET COMPLETE</h3>
-      <p>
+      <h3 class="rezgo-confirm-pending"><span>BOOKING NOT YET COMPLETE</span></h3>
+      <p class="rezgo-confirm-pending">
+        <span>
         <? if($site->exists($booking->paypal_owed)) { ?>
         To complete your booking, make your payment by clicking on the button below.
         <br />
@@ -46,10 +48,11 @@
         <? } else { ?>
         Your booking will be complete once payment has been processed.
         <? } ?>
+        </span>
       </p>
       <? } ?>
       <? if($booking->status == 3) { ?>
-      <h3>This booking has been CANCELLED</h3>
+      <h3 class="rezgo-confirm-cancelled"><span>This booking has been CANCELLED</span></h3>
       <? } ?>
       <? if($site->exists($booking->paypal_owed)) { ?>
       <div class="row">
@@ -110,7 +113,7 @@
               <td class="text-right"><label>Cost</label></td>
               <td class="text-right"><label>Total</label></td>
             </tr>
-            <? foreach( $site->getBookingPrices() as $price ): ?>
+            <? foreach( $site->getBookingPrices() as $price ) { ?>
             <tr>
               <td class="text-right">
                 <?=$price->label?></td>
@@ -124,7 +127,7 @@
               <td class="text-right">
                 <?=$site->formatCurrency($price->total)?></td>
             </tr>
-            <? endforeach; ?>
+            <? } // end foreach( $site->getBookingPrices() as $price ) ?>
             <tr>
               <td colspan="3" class="text-right"><strong>Sub-total</strong></td>
               <td class="text-right">
@@ -154,14 +157,14 @@
               <? } ?>
               
             <? } ?>
-            <? foreach( $site->getBookingFees() as $fee ): ?>
-            <? if( $site->exists($fee->total_amount) ): ?>
-            <tr>
-              <td colspan="3" class="text-right"><strong><?=$fee->label?></strong></td>
-              <td class="text-right"><?=$site->formatCurrency($fee->total_amount)?></td>
-            </tr>
-            <? endif; ?>
-            <? endforeach; ?>
+            <? foreach( $site->getBookingFees() as $fee ) { ?>
+							<? if( $site->exists($fee->total_amount) ) { ?>
+              <tr>
+                <td colspan="3" class="text-right"><strong><?=$fee->label?></strong></td>
+                <td class="text-right"><?=$site->formatCurrency($fee->total_amount)?></td>
+              </tr>
+              <? } ?>
+            <? } ?>
             <tr>
               <td colspan="3" class="text-right"><strong>Total</strong></td>
               <td class="text-right"><strong>
@@ -195,46 +198,52 @@
       </div>
       <div class="col-sm-12">
       	<table border="0" cellspacing="0" cellpadding="2" class="rezgo-table-list">
-          <tr>
-            <td class="rezgo-td-label">Transaction&nbsp;#:</td>
+          <tr id="rezgo-receipt-transnum">
+            <td class="rezgo-td-label"><span>Transaction&nbsp;#:</span></td>
             <td class="rezgo-td-data"><?=$booking->trans_num?></td>
           </tr>
-          <tr>
-            <td class="rezgo-td-label">Date:</td>
-            <td class="rezgo-td-data"><?=date((string) $company->date_format, (int) $booking->date)?></td>
+          <tr id="rezgo-receipt-booked-for">
+            <td class="rezgo-td-label"><span>Date:</span></td>
+            <td class="rezgo-td-data"><?=date((string) $company->date_format, (int) $booking->date)?>
+            <? if ($booking->time != '') { ?> at <?=$booking->time?><? } ?>
+            </td>
           </tr>
-          <tr>
-            <td class="rezgo-td-label">Duration:</td>
+          <tr id="rezgo-receipt-duration">
+            <td class="rezgo-td-label"><span>Duration:</span></td>
             <td class="rezgo-td-data"><?=$item->duration?></td>
           </tr>
-          <tr>
-            <td class="rezgo-td-label">Location:</td>
+          <tr id="rezgo-receipt-location">
+            <td class="rezgo-td-label"><span>Location:</span></td>
             <td class="rezgo-td-data">
 						<?
+						if ($item->location_name != '') {
+							echo $item->location_name . ', ' . $item->location_address;
+						} else {
 							unset($loc);
 							if($site->exists($item->city)) $loc[] = $item->city;
 							if($site->exists($item->state)) $loc[] = $item->state;
 							if($site->exists($item->country)) $loc[] = $site->countryName($item->country);
 							if($loc) echo implode(', ', $loc);
+						}
             ?>
             </td>
           </tr>
-          <tr>
-            <td class="rezgo-td-label">Departure/Pickup Location:</td>
+          <tr id="rezgo-receipt-pickup">
+            <td class="rezgo-td-label"><span>Pickup/Departure Information:</span></td>
             <td class="rezgo-td-data"><?=$item->details->pick_up?></td>
           </tr>
-          <tr>
-            <td class="rezgo-td-label">Dropoff/Return Information:</td>
+          <tr id="rezgo-receipt-dropoff">
+            <td class="rezgo-td-label"><span>Dropoff/Return Information:</span></td>
             <td class="rezgo-td-data"><?=$item->details->drop_off?></td>
           </tr>
-          <tr>
-            <td class="rezgo-td-label">Things to bring:</td>
+          <tr id="rezgo-receipt-thingstobring">
+            <td class="rezgo-td-label"><span>Things to bring:</span></td>
             <td class="rezgo-td-data"><?=$item->details->bring?></td>
           </tr>
-          <tr>
+          <tr class="rezgo-receipt-itinerary">
             <td colspan="2"><strong>Itinerary:</strong></td>
           </tr>
-          <tr>
+          <tr class="rezgo-receipt-itinerary">
             <td colspan="2" class="rezgo-td-data"><?=$item->details->itinerary?></td>
           </tr>
         </table>
@@ -243,35 +252,116 @@
     </div>
     <!-- // tour confirmation--> 
     
+    <? if ($item->lat != '' && $item->lon != '') { ?>
+    <!-- start receipt map -->
+    
+		<script>
+      var markersArray = [];
+      var map;
+      //
+      var lat = <?=$item->lat?>;
+      var lon = <?=$item->lon?>;
+      var zoom = <?=(($item->zoom != '' && $item->zoom > 0) ? $item->zoom : 6)?>;
+      
+      var myCenter=new google.maps.LatLng(lat, lon);
+      function initialize() {
+        var mapProp = {
+          center:myCenter,
+          zoom:zoom,
+					scrollwheel: false,
+					<? if ($site->config('REZGO_MOBILE_XML')) { ?>
+					draggable: false,
+					<? } ?>
+          mapTypeControl:false,
+          sensor:true,
+          mapTypeId:google.maps.MapTypeId.<?=$item->map_type?>
+        };
+        
+        map = new google.maps.Map(document.getElementById("rezgo-receipt-map"), mapProp);
+        
+        google.maps.event.addListener(map, 'zoom_changed', function() {
+          document.getElementById("zoom").value = map.getZoom();
+        });
+        
+          
+				var marker = new google.maps.Marker({
+					position: new google.maps.LatLng(<?=$item->lat?>, <?=$item->lon?>),
+					map: map
+				});
+				
+				markersArray.push(marker);        
+          
+      }
+      
+      function clearOverlays() {
+        for (var i = 0; i < markersArray.length; i++ ) {
+         markersArray[i].setMap(null);
+        }
+      }
+            
+			google.maps.event.addDomListener(window, 'load', initialize);
+      
+      
+    </script>  
+    
+    <div class="row" id="rezgo-receipt-map-container">
+      <div class="col-xs-12">
+      	<h3 id="rezgo-receipt-head-map"><span>Map</span></h3>
+        <div id="rezgo-receipt-map"></div>
+        
+        <div class="rezgo-map-location rezgo-map-shadow">
+          <? if($item->location_name) { ?>
+            <div class="rezgo-map-icon pull-left"><i class="fa fa-comment"></i></div> <?=$item->location_name?>
+            <div class="rezgo-map-hr"></div>
+          <? } ?>
+          
+          <? if($item->location_address) { ?>
+            <div class="rezgo-map-icon pull-left"><i class="fa fa-location-arrow"></i></div> <?=$item->location_address?>
+            <div class="rezgo-map-hr"></div>
+          <? } else { ?>
+            <div class="rezgo-map-icon pull-left"><i class="fa fa-location-arrow"></i></div> <?=$item->city.' '.$item->state.' '.$a->countryFormat($item->country)?>
+            <div class="rezgo-map-hr"></div>
+          <? } ?>
+          
+          <div class="rezgo-map-icon pull-left"><i class="fa fa-globe"></i></div> <?=round((float) $item->lat, 3)?>, <?=round((float) $item->lon, 3)?>
+        </div>
+        
+      </div>
+    </div>  
+    <!-- end receipt map -->
+    
+    <? } ?>
+    
+    
     <div class="row rezgo-form-group rezgo-confirmation-additional-info">
       <div class="col-md-7 col-xs-12">
-        <h3>Billing Information</h3>
+        <h3 id="rezgo-receipt-head-billing-info"><span>Billing Information</span></h3>
       	<table border="0" cellspacing="0" cellpadding="2" class="rezgo-table-list">
-          <tr>
+          <tr id="rezgo-receipt-name">
             <td class="rezgo-td-label">Name</td>
             <td class="rezgo-td-data"><?=$booking->first_name?> <?=$booking->last_name?></td>
           </tr>
-          <tr>
+          <tr id="rezgo-receipt-address">
             <td class="rezgo-td-label">Address</td>
             <td class="rezgo-td-data">
 							<?=$booking->address_1?><? if($site->exists($booking->address_2)) { ?>, <?=$booking->address_2?><? } ?><? if($site->exists($booking->city)) { ?>, <?=$booking->city?><? } ?><? if($site->exists($booking->stateprov)) { ?>, <?=$booking->stateprov?><? } ?><? if($site->exists($booking->postal_code)) { ?>, <?=$booking->postal_code?><? } ?>, <?=$site->countryName($booking->country)?>
             </td>
           </tr>
-          <tr>
+          <tr id="rezgo-receipt-phone">
             <td class="rezgo-td-label">Phone Number</td>
             <td class="rezgo-td-data"><?=$booking->phone_number?></td>
           </tr>
-          <tr>
+          <tr id="rezgo-receipt-email">
             <td class="rezgo-td-label">Email Address</td>
             <td class="rezgo-td-data"><?=$booking->email_address?></td>
           </tr>
           <? if($booking->overall_total > 0) { ?>
-            <tr>
+            <tr id="rezgo-receipt-payment-method">
               <td class="rezgo-td-label">Payment Method</td>
               <td class="rezgo-td-data"><?=$booking->payment_method?></td>
             </tr>
             <? if($booking->payment_method == 'Credit Cards') { ?>
-            <tr>
+            <tr id="rezgo-receipt-cardnum">
               <td class="rezgo-td-label">Card Number</td>
               <td class="rezgo-td-data"><?=$booking->card_number?></td>
             </tr>
@@ -283,7 +373,7 @@
             </tr>
             <? } ?>
           <? } ?>
-          <tr>
+          <tr id="rezgo-receipt-payment-status">
             <td class="rezgo-td-label">Payment Status</td>
             <td class="rezgo-td-data">
 							<?=(($booking->status == 1) ? 'CONFIRMED' : '')?>
@@ -292,8 +382,8 @@
             </td>
           </tr>
           <? if($site->exists($booking->trigger_code)) { ?>
-          <tr>
-            <td class="rezgo-td-label">Promotional Code</td>
+          <tr id="rezgo-receipt-trigger">
+            <td class="rezgo-td-label" class="rezgo-promo-label"><span>Promotional Code</span></td>
             <td class="rezgo-td-data"><?=$booking->trigger_code?></td>
           </tr>
           <? } ?>
@@ -301,37 +391,42 @@
 
 				<? if(count($site->getBookingForms()) > 0 OR count($site->getBookingPassengers()) > 0) { ?>
           
-        <h4>Customer Information</h4>
+        <h4 id="rezgo-receipt-head-customer-info"><span>Customer Information</span></h4>
         
           <table border="0" cellspacing="0" cellpadding="2" class="rezgo-table-list">
                   
-            <? foreach( $site->getBookingForms() as $form ): ?>
+            <? foreach( $site->getBookingForms() as $form ) { ?>
 							<? if($form->type == 'checkbox') { ?>
                 <? if($site->exists($form->answer)) { $form->answer = 'yes'; } else { $form->answer = 'no'; } ?>
               <? } ?>
-              <tr>
+              <tr class="rezgo-receipt-primary-forms">
                 <td class="rezgo-td-label"><?=$form->question?></td>
                 <td class="rezgo-td-data"><?=$form->answer?>&nbsp;</td>
               </tr>
-            <? endforeach; ?>
+            <? } ?>
             
-            <? foreach( $site->getBookingPassengers() as $passenger ): ?>
+            <? foreach( $site->getBookingPassengers() as $passenger ) { ?>
             
-              <tr><td class="rezgo-td-label"><?=$passenger->label?></td><td class="rezgo-td-data">( <?=$passenger->num?> )&nbsp;</td></tr>
-              <tr><td class="rezgo-td-label">Name</td><td class="rezgo-td-data"><?=$passenger->first_name?> <?=$passenger->last_name?>&nbsp;</td></tr>
-              <tr><td class="rezgo-td-label">Phone Number</td><td class="rezgo-td-data"><?=$passenger->phone_number?>&nbsp;</td></tr>
-              <tr><td class="rezgo-td-label">Email</td><td class="rezgo-td-data"><?=$passenger->email_address?>&nbsp;</td></tr>
-              <? foreach( $passenger->forms->form as $form ): ?>
+              <tr class="rezgo-receipt-pax"><td class="rezgo-td-label"><?=$passenger->label?></td><td class="rezgo-td-data">( <?=$passenger->num?> )&nbsp;</td></tr>
+              <tr class="rezgo-receipt-pax"><td class="rezgo-td-label">Name</td><td class="rezgo-td-data"><?=$passenger->first_name?> <?=$passenger->last_name?>&nbsp;</td></tr>
+              <? if ((string) $passenger->phone_number != '') { ?>
+              <tr class="rezgo-receipt-pax-phone"><td class="rezgo-td-label">Phone Number</td><td class="rezgo-td-data"><?=$passenger->phone_number?>&nbsp;</td></tr>
+              <? } 
+							if ((string) $passenger->email_address != '') {
+							?>
+              <tr class="rezgo-receipt-pax-email"><td class="rezgo-td-label">Email</td><td class="rezgo-td-data"><?=$passenger->email_address?>&nbsp;</td></tr>
+              <? } ?>
+              <? foreach( $passenger->forms->form as $form ) { ?>
                 <? if($form->type == 'checkbox') { ?>
                   <? if($site->exists($form->answer)) { $form->answer = 'yes'; } else { $form->answer = 'no'; } ?>
                 <? } ?>
-                <tr>
+                <tr class="rezgo-receipt-guest-forms">
                   <td class="rezgo-td-label"><?=$form->question?></td>
                   <td class="rezgo-td-data"><?=$form->answer?>&nbsp;</td>
                 </tr>
-              <? endforeach; ?>
+              <? } ?>
             
-            <? endforeach; ?>
+            <? } ?>
             
           </table>
             
@@ -341,7 +436,7 @@
       </div>
       
       <div class="col-md-5 col-xs-12 rezgo-company-info">
-        <h3>Cancellation Policy</h3>
+        <h3 id="rezgo-receipt-head-cancel"><span>Cancellation Policy</span></h3>
         <p>
         <? if($site->exists($booking->rezgo_gateway)) { ?>
         Canceling a booking with Rezgo can result in cancellation fees being
@@ -382,7 +477,7 @@
         </p>
         
 				<? if($site->exists($booking->rid)) { ?>
-        <h3>Customer Service</h3>
+        <h3 id="rezgo-receipt-head-customer-service"><span>Customer Service</span></h3>
         <p>
           <? if($site->exists($booking->rezgo_gateway)) { ?>
           Rezgo.com<br />
@@ -422,7 +517,7 @@
         </p>
         <? } ?>
         
-        <h3>Service Provided by</h3>
+        <h3 id="rezgo-receipt-head-provided-by"><span>Service Provided by</span></h3>
         <address>
 					<? $company = $site->getCompanyDetails($booking->cid); ?>
           <strong><?=$company->company_name?></strong><br />
@@ -446,32 +541,11 @@
 </div>
 <!-- //  rezgo-container --> 
 
-<? endforeach; ?>
-
-
-<? if($_SESSION['REZGO_CONVERSION_ANALYTICS']) { ?>
-<?=$_SESSION['REZGO_CONVERSION_ANALYTICS']?>
-
-<!-- HitsLink.com tracking script --> 
-<script type="text/javascript" id="wa_u" defer></script> 
-<script type="text/javascript" async>//<![CDATA[
-	var wa_pageName=location.pathname;    // customize the page name here;
-	wa_account="C6CFCDCACDCFC7CBCDCB"; wa_location=93;
-	wa_MultivariateKey = '';    //  Set this variable to perform multivariate testing
-	ec_Orders_orderID='<?=$trans_num?>';      //  Enter the Orders unique ID
-	ec_Orders_orderAmt='<?=$booking->overall_total?>';  //  Enter the amount of the Orders
-	var wa_c=new RegExp('__wa_v=([^;]+)').exec(document.cookie),wa_tz=new Date(),
-	wa_rf=document.referrer,wa_sr=location.search,wa_hp='http'+(location.protocol=='https:'?'s':'');
-	if(top!==self){wa_rf=top.document.referrer;wa_sr=top.location.search}
-	if(wa_c!=null){wa_c=wa_c[1]}else{wa_c=wa_tz.getTime();
-	document.cookie='__wa_v='+wa_c+';path=/;expires=1/1/'+(wa_tz.getUTCFullYear()+2);}wa_img=new Image();
-	wa_img.src=wa_hp+'://counter.hitslink.com/statistics.asp?v=1&s=93&eacct='+wa_account+'&an='+
-	escape(navigator.appName)+'&sr='+escape(wa_sr)+'&rf='+escape(wa_rf)+'&mvk='+escape(wa_MultivariateKey)+
-	'&sl='+escape(navigator.systemLanguage)+'&l='+escape(navigator.language)+
-	'&pf='+escape(navigator.platform)+'&pg='+escape(wa_pageName)+'&cd='+screen.colorDepth+'&rs='+escape(screen.width+
-	' x '+screen.height)+'&je='+navigator.javaEnabled()+'&c='+wa_c+'&tks='+wa_tz.getTime()
-	+'&ec_type=111133&ec_uniqueId='+ec_Orders_orderID+'&ec_orderAmount='+ec_Orders_orderAmt
-	;document.getElementById('wa_u').src=wa_hp+'://counter.hitslink.com/track.js';//]]>
-	</script>
-<? unset($_SESSION['REZGO_CONVERSION_ANALYTICS']); ?>
 <? } ?>
+
+<? 
+	if($_SESSION['REZGO_CONVERSION_ANALYTICS']) { 
+		echo $_SESSION['REZGO_CONVERSION_ANALYTICS'];
+		unset($_SESSION['REZGO_CONVERSION_ANALYTICS']);
+	} 
+?>

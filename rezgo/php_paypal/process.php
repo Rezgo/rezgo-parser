@@ -23,9 +23,6 @@ include_once('includes/global_config.inc.php');
 <form method="post" name="paypal_form" action="<?=$paypal[url]?>">
 <?php
 //show paypal hidden variables
-//$paypal[site_url]="https://".$domain.".booking-server.com/";
-//$paypal[success_url]="booking_complete_2.php";
-//echo "<br>success url = ".$paypal[success_url];
 showVariables();
 ?> 
 <br><br><br>

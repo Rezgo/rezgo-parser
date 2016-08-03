@@ -1,6 +1,6 @@
 /*!
  * Rezgo v6 (http://www.rezgo.com)
- * Copyright 2007-2014 Rezgo
+ * Copyright 2007-2016 Rezgo
  */
 
 @charset "UTF-8";
@@ -125,6 +125,22 @@ and (max-device-width : 480px) {
  .rezgo-confirmation-head h3 {
 	 font-size:18px;
  }
+	#rezgo-tour-tags {
+		margin-left:15px;
+	} 
+	.rezgo-related {
+		margin:6px 0 6px 0 !important;
+		padding:6px;
+	}
+	.rezgo-related-details {
+		background-color:#EEE;
+	}	
+	#rezgo-receipt-map-container {
+		padding:0px;
+	}
+	#rezgo-receipt-map-container h3 {
+		margin-left:2px;
+	}	
 }
 
 /* iPads (portrait) ----------- */
@@ -309,7 +325,7 @@ input:-moz-focus-inner {
 /* tour list */
 .rezgo-intro {
 	margin-top:25px;
-	font-weight:200;
+	font-weight:300;
 	font-size:18px;
 }
 .rezgo-searchbox {
@@ -435,6 +451,9 @@ p.rezgo-list-price {
 	font-weight:normal;
 	float:left;
 }
+.rezgo-section a {
+	cursor:pointer;
+}
 .rezgo-list-image {
 	overflow:hidden;
 }
@@ -468,6 +487,7 @@ p.rezgo-list-price {
 	text-decoration:underline;
 	display: inline-block;
 	vertical-align: bottom;
+	cursor:pointer;
 }
 #rezgo-cart-list {
 	border: 1px solid #ddd;
@@ -626,7 +646,7 @@ p.rezgo-list-price {
 }
 .rezgo-cart-link {
 	font-size:16px;
-	font-weight:200;
+	font-weight:300;
 	float:right;
 	margin-top:26px;
 	padding:5px 8px;
@@ -643,6 +663,7 @@ p.rezgo-list-price {
 	padding:8px 20px;
 	color:#FFFFFF;
 	text-align:center;
+	text-transform:uppercase;
 }
 .rezgo-calendar {
 	border-left:10px solid #1D86C8;
@@ -664,6 +685,22 @@ p.rezgo-list-price {
 	color:#FFFFFF;
 	height:40px;
 	font-size:16px;
+}
+#rezgo-date-wait {
+  background-color: #fff;
+  border: 1px solid #666;
+  border-radius: 6px;
+  color: #333;
+  height: 30%;
+  line-height: 40px;
+  margin: 10px auto;
+  opacity: 0.95;
+  padding: 10px;
+  position: absolute;
+  right: 5%;
+  text-align: center;
+  top: 20%;
+  width: 90%;
 }
 .rezgo-calendar-legend {
 	background:#eee;
@@ -723,7 +760,7 @@ p.rezgo-list-price {
 .rezgo-date-options {
 	height:40px;
 	font-size:16px;
-	font-weight:200;
+	font-weight:300;
 	padding-top:6px;
 	margin-bottom:4px;
 }
@@ -735,6 +772,9 @@ p.rezgo-list-price {
 	padding:0 !important;
 	position:relative;
 	top:2px;	
+}
+.rezgo-panel-option-link {
+	cursor:pointer;
 }
 .rezgo-spot {
 	background-color:#eee;
@@ -797,8 +837,11 @@ p.rezgo-list-price {
 }
 .rezgo-tour-description p,
 .rezgo-panel .rezgo-panel-body {
-	font-weight:200;
+	font-weight:300;
 	font-size:16px;	
+}
+.panel-body.review-panel-body {
+	padding:0 !important;
 }
 .rezgo-tour-description {
 	margin: 0 10px 12px 10px;
@@ -881,7 +924,7 @@ td.rezgo-order-unavailable {
 }
 #rezgo-secure-seal {
 	float:left; 
-	padding-left:50px;
+	/*padding-left:50px;*/
 }
 #verisign-seal {
 	margin-right:10px;
@@ -895,6 +938,7 @@ td.rezgo-order-unavailable {
 #rezgo-book-errors {
 	display:none;
 	margin-right:2%;
+	margin-top:8px;
 }
 #book_step_one {
 }
@@ -963,6 +1007,10 @@ label.rezgo-label-right {
 }
 .rezgo-form-checkbox label span.help-block {
 	font-weight:normal;
+}
+.rezgo-payment-terms span.help-block {
+	font-size: 90%;
+	color: #a94442;
 }
 .rezgo-form-checkbox em {
 	color:#990000;
@@ -1080,6 +1128,7 @@ label.rezgo-label-right {
 }
 #rezgo-terms-link {
 	text-decoration:none;
+	cursor:pointer;
 }
 #rezgo-terms-link:after {
 	/* symbol for "opening" panels */
@@ -1318,7 +1367,7 @@ label[for=payment_method_credit] img {
 
 /* about page */
 #rezgo-about-content {
-	font-weight:200;
+	font-weight:300;
 	font-size:18px;	
 }
 /* hidden contact field */
@@ -1337,7 +1386,7 @@ label[for=payment_method_credit] img {
 	border: 1px solid #860400;
 	border-radius: 4px;
 	padding: 8px;
-	font-weight:200;
+	font-weight:300;
 }
 #recaptcha_response_field {
 	height:18px;
@@ -1346,6 +1395,9 @@ label[for=payment_method_credit] img {
 #rezgo-img-carousel {
 	background-color:#000;
 	margin-top:4px;
+}
+#rezgo-img-carousel a {
+	cursor:pointer;
 }
 #rezgo-img-carousel .item {
 	/*height:435px;*/
@@ -1374,7 +1426,7 @@ label[for=payment_method_credit] img {
 	transition: width 0.6s ease 0s;
 }
 .rezgo-option-error {
-	margin-bottom:8px;
+	margin-bottom:12px;
 	font-size:90%;
 }
 p.rezgo-form-comment {
@@ -1479,7 +1531,7 @@ td.rezgo-td-data p {
 	padding:8px 12px; 
 	background:#FFF; 
 	z-index:300; 
-	font-weight:200;
+	font-weight:300;
 	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }  
 .rezgo-map-hr {
@@ -1514,12 +1566,19 @@ td.rezgo-td-data p {
 }
 .rezgo-location-country {
 }
+#rezgo-tour-tags {
+	margin-top:5px;
+}
 /* related items */
 .rezgo-related {
-	margin:4px 6px;
+	margin-top:25px;
+	padding:10px 6px;
+	border-top:1px solid #DDD;
+}
+.rezgo-related-details {
 }
 .rezgo-related-label {
-	font-size:18px;
+	font-size:16px;
 }
 .rezgo-related-label>span {
 	text-transform:uppercase;
@@ -1528,3 +1587,115 @@ td.rezgo-td-data p {
 .rezgo-related-link {
 	text-decoration:none;
 }
+
+#rezgo-details-promo {
+	border:2px solid #1D86C8;
+	border-radius:4px;
+	margin-bottom:25px;
+	padding:4px;
+	display:none;
+}  
+#rezgo-receipt-map {
+	height:390px; 
+	width:95%;
+	position:relative; 
+	z-index:200; 
+	border:1px solid #CCC;
+	margin:0 auto;
+}
+#rezgo-receipt-map-container {
+	background:#FFFFFF;
+	padding:5px;
+}
+#rezgo-receipt-map-container h3 {
+	margin-left:14px;
+}
+#rezgo-panel-reviews {
+	/*display:none;*/
+}  
+#rezgo-review-ratings {
+	margin:4px auto;
+}  
+#rezgo-review-ratings, #rezgo-review-ratings a, #rezgo-review-ratings a:visited {
+	color:#589442;
+	text-decoration:none;
+}
+#tripadvisor-rating-logo {
+	max-height:30px;
+	border:none;
+}
+#tripadvisor-rating-bubbles {
+	border:none;
+}
+#tripadvisor-rating-count {
+	color:#666;
+	font-size:90%;
+}
+
+#rezgo-copy-pax-desc {
+	font-size:15px;
+	font-weight:normal;
+	color:#666;
+}
+
+.rezgo-page-content {
+	font-size:14px;
+	padding:20px;
+	background:#FFFFFF;
+	margin-bottom:20px;
+}
+p.rezgo-ta-privacy, #rezgo-terms-panel>p.rezgo-ta-privacy {
+	font-weight:bold;
+}
+
+.rezgo-booking-share {
+	float:right;
+}
+.rezgo-sms {
+	padding:0 2px 2px 0;
+	font-size:14px;
+	color:#666;
+}
+
+.rezgo-map-location {
+	min-width:150px; 
+	max-width:100%; 
+	position:absolute; 
+	top:60px; 
+	left:45px; 
+	padding:8px 12px; 
+	background:#FFF; 
+	z-index:300; 
+	font-weight:200;
+	font-size:13px;
+}
+.rezgo-map-shadow {
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+.rezgo-map-icon {
+	margin-right:4px;	
+	width:18px;
+	color:#336699;
+	font-size:16px;
+}
+.rezgo-map-hr {
+  display: block;
+  height: 0px;
+  overflow: hidden;
+  font-size: 0;
+  border-top: 1px solid #E3E3E3;
+  margin: 4px 0;
+}
+
+#rezgo-receipt-map-location {
+	margin-left:16px;
+	margin-bottom:8px;
+}
+
+.rezgo-voucher-para label {
+	margin-bottom:0;
+}
+
+/*
+
+*/

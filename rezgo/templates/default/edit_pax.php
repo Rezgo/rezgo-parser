@@ -1,5 +1,5 @@
 <?php
-	/* url: '<?=$site->base?>/edit_pax.php?id=' + order_item + '&order_id=' + cart_id + '&date=' + book_date, */
+	/* edit_pax.php?id=' + order_item + '&order_id=' + cart_id + '&date=' + book_date, */
 	$option = $site->getTours('t=uid&q='.$_REQUEST['id'].'&d='.$_REQUEST['date']);
 	
 	$site->readItem($option[0]);
@@ -81,7 +81,21 @@
     			
           <? 
 					$total_required = 0;
+					
 					foreach( $prices as $price ) {
+						
+						/* 
+            TODO:
+						There is a mismatch between labels between cart and getTourPrices()
+						Consider fixing in the class instead
+						*/
+						
+						if (in_array( $price->name, array('adult', 'child', 'senior'))) {
+							$price_name = 'price_'.$price->name;
+						} else {
+							$price_name = $price->name;
+						}
+						
 					?>
           
             <script>fields_<?=$order_id?>['<?=$price->name?>_<?=$order_id?>'] = <?=(($price->required) ? 1 : 0)?>;</script>
@@ -89,9 +103,11 @@
             <div class="form-group row">
             
               <div class="col-md-2 col-xs-4"><input type="number" name="edit[<?=$order_id?>][<?=$price->name?>_num]" value="<?=(string) $cart[$order_id]->{$price->name.'_num'}?>" id="<?=$price->name?>_<?=$order_id?>" size="3" class="form-control input-sm" /></div>
-              <label for="<?=$price->name?>" class="col-xs-8 control-label rezgo-label-margin">x&nbsp;&nbsp;<?=$price->label?><?=(($price->required && $site->getTourRequired()) ? ' <em><i class="fa fa-asterisk"></i></em>' : '')?>&nbsp;(
-              <? if($site->exists($cart[$order_id]->date->base_prices->{'price_'.$price->name})) { ?><span class="discount"><?=$site->formatCurrency($cart[$order_id]->date->base_prices->{'price_'.$price->name})?></span><? } ?>
-              <?=$site->formatCurrency($cart[$order_id]->date->{'price_'.$price->name})?> )</label>
+              <label for="<?=$price->name?>" class="col-xs-8 control-label rezgo-label-margin">x&nbsp;&nbsp;<?=$price->label?><?=(($price->required && $site->getTourRequired()) ? ' <em><i class="fa fa-asterisk"></i></em>' : '')?>
+              <span class="rezgo-pax-price">&nbsp;(
+              <? if($site->exists($cart[$order_id]->date->base_prices->{$price_name})) { ?><span class="discount"><?=$site->formatCurrency($cart[$order_id]->date->base_prices->{$price_name})?></span><? } ?>
+              <?=$site->formatCurrency($cart[$order_id]->date->{$price_name})?> )</span>
+              </label>
             </div> <!-- //  form-group -->
                          
           <? 
@@ -103,7 +119,7 @@
           <div class="text-danger rezgo-option-error" id="error_text_<?=$order_id?>" style="display:none;"></div>
         
           <div class="form-group pull-right">
-            <a data-toggle="collapse" href="#pax-edit-<?=$order_id?>">Cancel</a>&nbsp;
+            <a data-toggle="collapse" data-target="#pax-edit-<?=$order_id?>">Cancel</a>&nbsp;
             <button type="submit" class="btn rezgo-btn-book" onclick="return check_pax_<?=$order_id?>();">Update Booking</button>
           </div>
           <br />

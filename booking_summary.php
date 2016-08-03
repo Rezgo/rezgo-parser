@@ -6,8 +6,8 @@
 	
 	// start a new instance of RezgoSite
 	$site = new RezgoSite();
-	
-	$company = $site->getCompanyDetails();
+
+	if(!$site->getBookings('q='.$_REQUEST['trans_num'])) { $site->sendTo("/booking-not-found:".$_REQUEST['trans_num']); } 
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -16,7 +16,7 @@
 		
 	  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	  <meta name="robots" content="noindex, nofollow">
-	  <title>Booking Summary for <?=$_REQUEST[trans_num]?></title>
+	  <title>Booking Summary for <?=$_REQUEST['trans_num']?></title>
     
     <!-- Bootstrap CSS -->
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
@@ -36,17 +36,18 @@
       <?=$site->getStyles();?>
     </style>
     <? } ?>
-	
+    
+    <? $company = $site->getCompanyDetails(); ?>
 	</head>
 <body>
 
 <? foreach( $site->getBookings($_REQUEST['trans_num']) as $booking ) { ?>
 
 	<? $site->readItem($booking); ?>
-	
-	<div class="container" id="rezgo-booking-summary">	
-		<h2>Booking details for <?=$site->getCompanyName($booking->cid)?></h2>
-		<h3><?=$booking->tour_name?> - <?=$booking->option_name?>
+  
+  <div class="container" id="rezgo-booking-summary">	
+    <h2>Booking details for <?=$site->getCompanyName($booking->cid)?></h2>
+    <h3><?=$booking->tour_name?> - <?=$booking->option_name?>
       <div class="rezgo-add-cal"><div class="rezgo-add-cal-cell"><a href="https://feed.rezgo.com/b/<?=$booking->trans_num?>"><i class="fa fa-calendar"></i>&nbsp;Add to my calendar</a></div></div>
     </h3>
     <small class="rezgo-booked-on">booked on <?=date((string) $company->date_format, (int) $booking->date_purchased_local)?> / local time</small>
@@ -146,7 +147,9 @@
       </tr>
       <tr>
         <td class="rezgo-td-label">Booked<span class="hidden-xs">&nbsp;For</span>:</td>
-        <td class="rezgo-td-data"><?=date((string) $company->date_format, (int)$booking->date)?></td>
+        <td class="rezgo-td-data"><?=date((string) $company->date_format, (int)$booking->date)?>
+				<? if ($booking->time != '') { ?> at <?=$booking->time?><? } ?>
+        </td>
       </tr>
       <tr>
         <td class="rezgo-td-label">Payment<span class="hidden-xs">&nbsp;Status</span>:</td>
@@ -167,8 +170,8 @@
     </table>
 
     <div class="clearfix">&nbsp;</div>
-		
-		<h3>Billing Details</h3>
+    
+    <h3>Billing Details</h3>
     
     <table border="0" cellspacing="0" cellpadding="2" class="rezgo-table-list">
       <tr>
@@ -191,8 +194,8 @@
     
     <div class="clearfix">&nbsp;</div>
     
-		<? if($booking->overall_total > 0) { ?>
-		<h3>Payment Details</h3>
+    <? if($booking->overall_total > 0) { ?>
+    <h3>Payment Details</h3>
     
     <table border="0" cellspacing="0" cellpadding="2" class="rezgo-table-list">
       <tr>
@@ -205,7 +208,7 @@
         <td class="rezgo-td-data"><?=$booking->card_number?></td>
       </tr>        
       <? } ?>
-			<? if($site->exists($booking->payment_method_add->label)) { ?>
+      <? if($site->exists($booking->payment_method_add->label)) { ?>
       <tr>
         <td class="rezgo-td-label"><?=$booking->payment_method_add->label?>:</td>
         <td class="rezgo-td-data"><?=$booking->payment_method_add->value?></td>
@@ -214,13 +217,13 @@
     </table>
     
     <div class="clearfix">&nbsp;</div>
-		<? } ?>
+    <? } ?>
     
-		<? if(count($site->getBookingForms()) > 0) { ?>
-		
-			<h3>Additional Information</h3>
+    <? if(count($site->getBookingForms()) > 0) { ?>
+    
+      <h3>Additional Information</h3>
       <table border="0" cellspacing="0" cellpadding="2" class="rezgo-table-list">
-				<? foreach( $site->getBookingForms() as $form ) { ?>
+        <? foreach( $site->getBookingForms() as $form ) { ?>
           <? if($form->type == 'checkbox') { ?>
             <? if($site->exists($form->answer)) { $form->answer = 'yes'; } else { $form->answer = 'no'; } ?>
           <? } ?>
@@ -231,35 +234,47 @@
         <? } ?>		
       </table>
       <div class="clearfix">&nbsp;</div>
-    		
-		<? } ?>
-		
-		<? if(count($site->getBookingPassengers()) > 0) { ?>
-		
-			<h3>Group Details</h3>
+        
+    <? } ?>
+    
+    <? if(count($site->getBookingPassengers()) > 0) { ?>
+    
+      <h3>Group Details</h3>
       <table border="0" cellspacing="0" cellpadding="2" class="rezgo-table-list">
-				<? foreach( $site->getBookingPassengers() as $passenger ) { ?>
+        <? foreach( $site->getBookingPassengers() as $passenger ) { ?>
           <tr>
             <td class="rezgo-td-label"><?=$passenger->label?> <?=$passenger->num?>:</td>
             <td class="rezgo-td-data"><?=$passenger->first_name?> <?=$passenger->last_name?></td>
           </tr>
-					<? foreach( $passenger->forms->form as $form ) { ?>
-						<? if($form->type == 'checkbox') { ?>
-							<? if($site->exists($form->answer)) { $form->answer = 'yes'; } else { $form->answer = 'no'; } ?>
-	 					<? } ?>
+          <? if ((string) $passenger->phone_number != '') { ?>
+          <tr>
+            <td class="rezgo-td-label">Phone Number:</td>
+            <td class="rezgo-td-data"><?=$passenger->phone_number?></td>
+          </tr>
+          <? } ?>
+          <? if ((string) $passenger->email_address != '') { ?>
+          <tr>
+            <td class="rezgo-td-label">Email:</td>
+            <td class="rezgo-td-data"><?=$passenger->email_address?></td>
+          </tr>
+          <? } ?>
+          <? foreach( $passenger->forms->form as $form ) { ?>
+            <? if($form->type == 'checkbox') { ?>
+              <? if($site->exists($form->answer)) { $form->answer = 'yes'; } else { $form->answer = 'no'; } ?>
+            <? } ?>
             <tr>
               <td class="rezgo-td-label"><?=$form->question?>:</td>
               <td class="rezgo-td-data"><?=$form->answer?></td>
             </tr>            
-					<? } ?>
-				<? } ?>	
+          <? } ?>
+        <? } ?>	
       </table>
 
       <div class="clearfix">&nbsp;</div>
-	
-		<? } ?>
-	
-	</div>
+  
+    <? } ?>
+  
+  </div>
 	
 <? } ?>
 
