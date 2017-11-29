@@ -55,6 +55,9 @@
 	// shopping cart lifespan
 	define( "REZGO_CART_TTL",							86400																				);
 	
+	// For sites that want all site pages to be secure
+	define("REZGO_ALL_SECURE", 						1																						);
+		
 	define( "REZGO_TEMPLATE", 						'default'																		);
 	
 	// Forward secure booking pages to the rezgo white-label, set to 0 if you want to

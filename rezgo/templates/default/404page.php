@@ -3,7 +3,7 @@
   <div class="jumbotron">
     <h1 id="rezgo-404-head">Page not found <i class="fa fa-exclamation-triangle"></i></h1>
     <p class="lead">Sorry, we could not find the page you were looking for.</p>
-    <p><a class="btn btn-lg btn-info" href="/" role="button">Return to home</a></p>
+    <p><a class="btn btn-lg btn-info" href="<?=$site->base?>/" role="button">Return to home</a></p>
     <br />
 
     <span class="lead">Search the site</span>

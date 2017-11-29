@@ -279,7 +279,7 @@ if (!Array.prototype.forEach){
     
     <div class="row">
         <ol class="breadcrumb rezgo-breadcrumb hidden-xs">
-          <li><a href="/order">Your Order</a></li>
+          <li><a href="<?=$site->base?>/order">Your Order</a></li>
           <li class="active">Guest Information</li>
           <li>Billing Information</li>
           <li>Confirmation</li>
@@ -659,7 +659,7 @@ if (!Array.prototype.forEach){
     <div class="row">
         <ol class="breadcrumb rezgo-breadcrumb hidden-xs">
 					<? if($site->getCartState()) { ?>
-          <li><a href="/order">Your Order</a></li>
+          <li><a href="<?=$site->base?>/order">Your Order</a></li>
           <? } ?>
           <li id="back-to-info"><a href="#" onClick="$('#book_steps  a:first').tab('show'); return false;">Guest Information</a></li>
           <li class="active">Billing Information</li>

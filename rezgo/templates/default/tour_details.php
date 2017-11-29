@@ -22,7 +22,7 @@ $ta_key = '2E2B919141464E31B384DE1026A2DE7B';
   <div class="jumbotron"> 
     <h3><i class="fa fa-exclamation-triangle"></i> Item not found</h3>
     <p class="lead">Sorry, the item you are looking for is not available or has no available options.</p>
-    <p><a class="btn btn-lg btn-info" href="/" role="button">Return to home</a></p>
+    <p><a class="btn btn-lg btn-info" href="<?=$site->base?>/" role="button">Return to home</a></p>
   </div>
   
 <? } else { ?>

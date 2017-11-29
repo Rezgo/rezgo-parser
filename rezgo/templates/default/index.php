@@ -42,7 +42,7 @@
     $footer.html('<div class="rezgo-wait-div"></div>');
     
     $.ajax({
-      url: '/index_ajax.php?pg=' + start + '&start_date=' + search_start_date + '&end_date=' + search_end_date + '&tags=' + search_tags + '&search_in=' + search_in + '&search_for=' + search_for + '&cid=' + cid,
+      url: '<?=$site->base?>/index_ajax.php?pg=' + start + '&start_date=' + search_start_date + '&end_date=' + search_end_date + '&tags=' + search_tags + '&search_in=' + search_in + '&search_for=' + search_for + '&cid=' + cid,
       context: document.body,
       success: function(data) {				
         
@@ -81,7 +81,7 @@
       $('#rezgo-list-content-more').fadeOut();
       //(Number(page_num) + 1)
       $.ajax({
-        url: '/index_ajax.php?pg=' + start + '&start_date=' + search_start_date + '&end_date=' + search_end_date + '&tags=' + search_tags + '&search_in=' + search_in + '&search_for=' + search_for + '&cid=' + cid,
+        url: '<?=$site->base?>/index_ajax.php?pg=' + start + '&start_date=' + search_start_date + '&end_date=' + search_end_date + '&tags=' + search_tags + '&search_in=' + search_in + '&search_for=' + search_for + '&cid=' + cid,
         context: document.body,
         success: function(data) {				
           

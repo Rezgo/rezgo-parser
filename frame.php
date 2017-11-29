@@ -91,10 +91,10 @@ if (!Array.prototype.forEach){
 </script>
 
 <div id="rezgo_content_container" style="width:100%;">
-	<iframe id="rezgo_content_frame" src="/<?=$_REQUEST['mode']?>?<?=$_SERVER['QUERY_STRING']?>" style="width:100%; height:900px; padding:0px; margin:0px;" frameBorder="0" scrolling="no"></iframe>
+	<iframe id="rezgo_content_frame" src="<?=$site->base?>/<?=$_REQUEST['mode']?>?<?=$_SERVER['QUERY_STRING']?>" style="width:100%; height:900px; padding:0px; margin:0px;" frameBorder="0" scrolling="no"></iframe>
 </div>
 
-<script type="text/javascript" src="/js/iframeResizer.min.js"></script>
+<script type="text/javascript" src="<?=$site->base?>/js/iframeResizer.min.js"></script>
 
 <script type="text/javascript">
 	iFrameResize ({

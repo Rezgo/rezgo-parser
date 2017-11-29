@@ -7,8 +7,8 @@
   <title><?=$_REQUEST['title']?></title>
   <style> body { overflow:hidden; } </style>
   
-  <script src="/js/iframeResizer.min.js"></script>
-  <script src="/js/iframeResizer.contentWindow.min.js"></script>
+  <script src="<?=$site->base?>/js/iframeResizer.min.js"></script>
+  <script src="<?=$site->base?>/js/iframeResizer.contentWindow.min.js"></script>
   
   <!-- Bootstrap CSS -->
   <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">

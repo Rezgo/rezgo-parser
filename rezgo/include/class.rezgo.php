@@ -515,7 +515,7 @@
 				} 
 			} else { 
 				// switch to non-https on the current domain
-				if($this->checkSecure()) { 			
+				if($this->checkSecure() && REZGO_ALL_SECURE !== 1) { 			
 					$this->sendTo($this->secure.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
 				} 
 			}

@@ -153,7 +153,7 @@ $company = $site->getCompanyDetails();
 			<? if(!$site->isVendor()) { ?>
         <div class="row rezgo-form-group-short">
         <? if (!$_SESSION['rezgo_promo']) { ?>
-          <form class="form-inline" id="rezgo-promo-form" role="form" onsubmit="top.location.href = '/order?promo=' + $('#rezgo-promo-code').val(); return false;">
+          <form class="form-inline" id="rezgo-promo-form" role="form" onsubmit="top.location.href = '<?=$site->base?>/order?promo=' + $('#rezgo-promo-code').val(); return false;">
             <label for="rezgo-promo-code"><i class="fa fa-tags"></i>&nbsp;<span class="rezgo-promo-label"><span>Promo code</span></span></label>&nbsp;
             <div class="input-group">
             <input type="text" class="form-control" id="rezgo-promo-code" name="promo" placeholder="Enter Promo Code" value="<?=($_SESSION['rezgo_promo'] ? $_SESSION['rezgo_promo'] : '')?>" />
@@ -163,7 +163,7 @@ $company = $site->getCompanyDetails();
         <? } else { ?>
           <label for="rezgo-promo-code"><i class="fa fa-tags"></i>&nbsp;<span class="rezgo-promo-label"><span>Promo code:</span></span></label>&nbsp;
         	<span id="rezgo-promo-value"><?=$_SESSION['rezgo_promo']?></span>&nbsp;
-          <a id="rezgo-promo-clear" class="btn rezgo-btn-default btn-sm" href="/order?promo=" target="_top">clear</a>
+          <a id="rezgo-promo-clear" class="btn rezgo-btn-default btn-sm" href="<?=$site->base?>/order?promo=" target="_top">clear</a>
         <? } ?>
         </div>
       <? } ?>
