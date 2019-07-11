@@ -30,9 +30,6 @@
 	define("REZGO_CAPTCHA_PUB_KEY", "");
 	define("REZGO_CAPTCHA_PRIV_KEY", "");
 
-	// GOOGLE MAPS KEY
-	//define("GOOGLE_API_KEY", "AIzaSyDUUazmZpVx9LxqJJS3-BCi0I_xpNUa2t4");
-
 	// Path to the rezgo install on your server, the default is /rezgo in the root.
 	// this is used by the template includes as well as fetching files in the templates
 	define(	"REZGO_DIR","/rezgo");
