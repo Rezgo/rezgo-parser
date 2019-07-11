@@ -11,6 +11,7 @@
 	
 	// send the user home if they shoulden't be here
 	if(!$trans_num) $site->sendTo($site->base."/booking-not-found");
+
 	// start a session so we can grab the analytics code
 	session_start();
 	
@@ -21,12 +22,12 @@
 	
 ?>
 
-<?=$site->getTemplate('frame_header')?>
+<?php echo $site->getTemplate('frame_header')?>
 
 
-<? if(strlen($trans_num) == 16) { ?>
+<?php if (strlen($trans_num) == 16) { ?>
 	
-	<?=$site->getTemplate('booking_order')?>
+	<?php echo $site->getTemplate('booking_order')?>
   
   <?
 		$ga_add_transacton = "
@@ -39,10 +40,10 @@
 		";
 	?>
 	
-<? } else { ?>
+<?php } else { ?>
 
-	<?=$site->getTemplate('booking_complete')?>
+	<?php echo $site->getTemplate('booking_complete')?>
 
-<? } ?>
+<?php } ?>
 
-<?=$site->getTemplate('frame_footer')?>
+<?php echo $site->getTemplate('frame_footer')?>

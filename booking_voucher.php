@@ -1,5 +1,5 @@
 <?php 
-	// This is the booking receipt page
+	// This is the booking voucher
 	
 	require('rezgo/include/page_header.php');
 	
@@ -8,9 +8,5 @@
 
 	$site->setMetaTags('<meta name="robots" content="noindex, nofollow">');
 ?>
-
-<? // getVoucherHeader() moved to template ?>
 	
-<?=$site->getTemplate('booking_voucher')?>
-	
-<? // getVoucherFooter() moved to template ?>
+<?php echo $site->getTemplate('booking_voucher')?>

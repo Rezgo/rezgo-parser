@@ -11,8 +11,8 @@
 	
 ?>
 
-<?=$site->getTemplate('frame_header')?>
+<?php echo $site->getTemplate('frame_header')?>
 
-<?=$site->getTemplate('terms')?>
+<?php echo $site->getTemplate('terms')?>
 			
-<?=$site->getTemplate('frame_footer')?>
+<?php echo $site->getTemplate('frame_footer')?>

@@ -1,0 +1,92 @@
+.m-signature-pad {
+	position: relative;
+	font-size: 10px;
+	width: 100%;
+	height: 400px;
+	background-color: #fff;
+}
+
+.m-signature-pad:before, .m-signature-pad:after {
+	position: absolute;
+	z-index: -1;
+	content: "";
+	width: 40%;
+	height: 10px;
+	left: 20px;
+	bottom: 10px;
+	background: transparent;
+}
+
+.m-signature-pad:after {
+	left: auto;
+	right: 20px;
+}
+
+.m-signature-pad-body {
+	position: absolute;
+	left: 10px;
+	right: 10px;
+	top: 0;
+	bottom: 60px;
+	height: 315px;
+	border: 1px solid #f4f4f4;
+}
+
+.m-signature-pad-body
+	canvas {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: 100%;
+		box-shadow: 0 0 5px rgba(0, 0, 0, 0.03) inset;
+	}
+
+.m-signature-pad-footer {
+	position: absolute;
+	left: 0;
+	right: 0;
+	/*bottom: 10px;*/
+	height: 40px;
+	bottom: -225px;
+}
+
+@media screen and (max-width: 1024px) {
+	.m-signature-pad {
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		width: auto;
+		height: auto;
+		min-width: 250px;
+		min-height: 140px;
+		margin: 5%;
+	}
+}
+
+@media screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+	.m-signature-pad {
+		margin: 10%;
+	}
+}
+
+@media screen and (max-height: 320px) {
+	.m-signature-pad-body {
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 32px;
+	}
+	.m-signature-pad-footer {
+		left: 20px;
+		right: 20px;
+		bottom: 4px;
+		height: 28px;
+	}
+	.m-signature-pad-footer
+		.description {
+			font-size: 1em;
+			margin-top: 1em;
+		}
+}

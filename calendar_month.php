@@ -15,11 +15,11 @@
 	
 	// if the item does not exist, we want to generate an error message and change the page accordingly
 	if(!$item) { 
-		$item = new stdClass();
+		$item = new stdClass();
 		$item->unavailable = 1;
 		$item->name = 'Item Not Available'; 
 	}	
 	
 ?>
 
-<?=$site->getTemplate('calendar_month')?>
+<?php echo $site->getTemplate('calendar_month')?>

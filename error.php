@@ -10,8 +10,8 @@
 	$site->setPageTitle('System Error');
 ?>
 
-<?=$site->getTemplate('frame_header')?>
+<?php echo $site->getTemplate('frame_header')?>
 
-<?=$site->getTemplate('error')?>
+<?php echo $site->getTemplate('error')?>
 						
-<?=$site->getTemplate('frame_footer')?>
+<?php echo $site->getTemplate('frame_footer')?>

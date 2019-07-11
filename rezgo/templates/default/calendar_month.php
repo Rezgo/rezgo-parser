@@ -24,6 +24,6 @@
 
 <script>
 	$('.responsive-calendar').responsiveCalendar('edit', {
-			<?=$calendar_events?>
+			<?php echo $calendar_events?>
 	});
 </script>

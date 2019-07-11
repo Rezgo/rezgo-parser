@@ -1,24 +1,22 @@
 <?php
 
 	/*
-		This is the Rezgo parser class, it handles processing for the Rezgo XML.
+		This is the Rezgo parser class, it handles processing for the Rezgo API.
 		
 		VERSION:
-				2.5.0
+				3.0.0
 		
 		- Documentation and latest version
-				http://support.rezgo.com/customer/portal/articles/1153719-open-source-php-parser
+				https://www.rezgo.com/rezgo-open-source-booking-engine/
 		
 		- Finding your Rezgo CID and API KEY
-				http://support.rezgo.com/customer/portal/articles/831818-xml-api-key
-		
-		- Discussion and Feedback
-				http://getsatisfaction.com/rezgo/products/rezgo_rezgo_open_source_php_parser
+				https://www.rezgo.com/support-article/create-api-keys
 		
 		AUTHOR:
 				Kevin Campbell
+				John McDonald
 		
-		Copyright (c) 2012-2013, Rezgo (A Division of Sentias Software Corp.)
+		Copyright (c) 2012-2018, Rezgo (A Division of Sentias Software Corp.)
 		All rights reserved.
 		
 		Redistribution and use in source form, with or without modification,
@@ -30,7 +28,7 @@
 		its contributors may be used to endorse or promote products derived
 		from this software without specific prior written permission.
 		* Source code is provided for the exclusive use of Rezgo members who
-		wish to connect to their Rezgo XMP API.  Modifications to source code
+		wish to connect to their Rezgo API. Modifications to source code
 		may not be used to connect to competing software without specific
 		prior written permission.
 		
@@ -49,14 +47,12 @@
 
 	class RezgoSite {
 	
-		var $version = '2.5.0';
+		var $version = '3.0.1';
 		
 		var $requestID;
-		
 		var $instanceID;
 		
 		var $xml_path;
-		
 		var $contents;
 		var $get;
 		var $xml;
@@ -68,14 +64,10 @@
 		// indexes are used to split up response caches by different criteria
 		var $tours_index = 0; // split up by search string
 		var $company_index = 0; // split up by CID (for vendors only, suppliers use 0)
-
 		var $currency_values;
-		
 		var $tour_limit;
-		
 		var $refid;
 		var $promo_code;
-		
 		var $pageTitle;
 		var $metaTags;
 		
@@ -90,7 +82,7 @@
 		var $calendar_months = array();
 		var $calendar_years = array();
 		
-		// xml result caches improve performance by not hitting the gateway multiple times
+		// api result caches improve performance by not hitting the gateway multiple times
 		// searches that have differing args sort them into arrays with the index variables above
 		var $company_response;
 		var $page_response = array();
@@ -102,14 +94,18 @@
 		var $cart_total;
 		var $commit_response;
 		var $contact_response;
+		var $ticket_response;
+		var $waiver_response;
+		var $signing_response;
+		var $review_response;
+		var $pickup_response;
+		var $payment_response;
 		
 		var $tour_forms;
-		
 		var $all_required;
-		
 		var $cart = array();
-		
 		var $cart_ids;
+		var $gift_card;
 		
 		// debug and error stacks
 		var $error_stack;
@@ -119,9 +115,10 @@
 		// if the class was called with an argument then we use that as the object name
 		// this allows us to load the object globalls for included templates.
 		// ------------------------------------------------------------------------------
+		
 		function __construct($secure=null, $newID=null) {
 			if(!$this->config('REZGO_SKIP_BUFFER')) ob_start();
-		
+			
 			// check the config file to make sure it's loaded
 			if(!$this->config('REZGO_CID')) $this->error('REZGO_CID definition missing, check config file', 1);
 			
@@ -148,19 +145,26 @@
 			if(!defined(REZGO_DOCUMENT_ROOT)) define("REZGO_DOCUMENT_ROOT", $_SERVER["DOCUMENT_ROOT"]);
 			
 			// set the secure mode for this particular page
-			$this->setSecure($secure);
+			if (REZGO_CUSTOM_DOMAIN) {
+				$this->setSecure($secure);
+			} else {
+				$this->setSecure('secure');
+			}
 			
 			// perform some variable filtering
 			if($_REQUEST['start_date']) {
 				if(strtotime($_REQUEST['start_date']) == 0) unset($_REQUEST['start_date']);
 			}
+			
 			if($_REQUEST['end_date']) {
 				if(strtotime($_REQUEST['end_date']) == 0) unset($_REQUEST['end_date']);
 			}
 			
 			// handle the refID if one is set
 			if($_REQUEST['refid'] || $_REQUEST['ttl'] || $_COOKIE['rezgo_refid_val'] || $_SESSION['rezgo_refid_val']) {
+				
 				if($_REQUEST['refid'] || $_REQUEST['ttl']) {
+					
 					$new_header = $_SERVER['REQUEST_URI'];
 					
 					// remove the refid information wherever it is
@@ -172,10 +176,20 @@
 					if(substr($new_header, -1) == '?') { $new_header = substr($new_header, 0, -1); }
 					
 					$refid = $this->requestStr('refid');
+					
 					$ttl = ($this->requestStr('ttl')) ? $this->requestStr('ttl') : 7200;
-				} 
-				elseif($_SESSION['rezgo_refid_val']) { $refid = $_SESSION['rezgo_refid_val']; $ttl = $_SESSION['rezgo_refid_ttl']; }
-				elseif($_COOKIE['rezgo_refid_val']) { $refid = $_COOKIE['rezgo_refid_val']; $ttl = $_COOKIE['rezgo_refid_ttl']; }
+					
+				} elseif($_SESSION['rezgo_refid_val']) { 
+				
+					$refid = $_SESSION['rezgo_refid_val']; 
+					$ttl = $_SESSION['rezgo_refid_ttl']; 
+				
+				} elseif($_COOKIE['rezgo_refid_val']) { 
+				
+					$refid = $_COOKIE['rezgo_refid_val']; 
+					$ttl = $_COOKIE['rezgo_refid_ttl']; 
+				
+				}
 				
 				setcookie("rezgo_refid_val", $refid, time() + $ttl, '/', $_SERVER['SERVER_NAME']);
 				setcookie("rezgo_refid_ttl", $ttl, time() + $ttl, '/', $_SERVER['SERVER_NAME']);
@@ -189,7 +203,8 @@
 					unset($_SESSION['rezgo_refid_ttl']);
 				}
 				
-				if(isset($new_header)) $this->sendTo((($this->checkSecure()) ? 'https://' : 'http://').$_SERVER['HTTP_HOST'].$new_header);
+					if(isset($new_header)) $this->sendTo((($this->checkSecure()) ? 'https://' : 'http://').$_SERVER['HTTP_HOST'].$new_header);
+				
 			}	
 			
 			// handle the promo code if one is set
@@ -231,7 +246,7 @@
 					unset($_SESSION['rezgo_promo']);
 				}
 				
-				if(isset($new_header)) $this->sendTo((($this->checkSecure()) ? 'https://' : 'http://').$_SERVER['HTTP_HOST'].$new_header);				
+				if(isset($new_header)) $this->sendTo((($this->checkSecure()) ? 'https://' : 'http://').$_SERVER['HTTP_HOST'].$new_header);	
 			}
 			
 			// handle the add to cart request if one is set
@@ -339,11 +354,11 @@
 			
 			$message = '['.urldecode($message).' for '.$stack['class'].'::'.$stack['function'].' in '.$stack['file'].' on line '.$stack['line'].']';
 			if($this->config('REZGO_FIREBUG_XML')) {
-				if(($i == 'commit' || $i == 'commitOrder') && $this->config('REZGO_SWITCH_COMMIT')) { if($this->config('REZGO_STOP_COMMIT')) { echo $_SESSION['error_catch'] = 'STOP::'.$message.'<br><br>'; } }
+				if(($i == 'commit' || $i == 'commitOrder' || $i == 'add_transaction') && $this->config('REZGO_SWITCH_COMMIT')) { if($this->config('REZGO_STOP_COMMIT')) { echo $_SESSION['error_catch'] = 'STOP::'.$message.'<br><br>'; } }
 				else { echo '<script>if(window.console != undefined) { console.info("'.addslashes($message).'"); }</script>'; }
 			}
-			if($this->config('REZGO_DISPLAY_XML'))  {
-				if(($i == 'commit' || $i == 'commitOrder') && $this->config('REZGO_SWITCH_COMMIT')) { die('STOP::'.$message); }
+			if($this->config('REZGO_DISPLAY_XML'))	{
+				if(($i == 'commit' || $i == 'commitOrder' || $i == 'add_transaction') && $this->config('REZGO_SWITCH_COMMIT')) { die('STOP::'.$message); }
 				else { echo '<textarea rows="2" cols="25">'.$message.'</textarea>'; }
 			}
 		}
@@ -361,18 +376,18 @@
 		function randstring($len = 10) {
 			$len = $len / 2;
 			
-	    $timestring = microtime();
-	    $secondsSinceEpoch=(integer) substr($timestring, strrpos($timestring, " "), 100);
-	    $microseconds=(double) $timestring;
-	    $seed = mt_rand(0,1000000000) + 10000000 * $microseconds + $secondsSinceEpoch;
-	    mt_srand($seed);
-	    $randstring = "";
-	    for($i=0; $i < $len; $i++) {
-	      $randstring .= mt_rand(0, 9);
-	      $randstring .= chr(ord('A') + mt_rand(0, 24));
-	    }
-	   	return($randstring);
-	  }
+			$timestring = microtime();
+			$secondsSinceEpoch=(integer) substr($timestring, strrpos($timestring, " "), 100);
+			$microseconds=(double) $timestring;
+			$seed = mt_rand(0,1000000000) + 10000000 * $microseconds + $secondsSinceEpoch;
+			mt_srand($seed);
+			$randstring = "";
+			for($i=0; $i < $len; $i++) {
+				$randstring .= mt_rand(0, 9);
+				$randstring .= chr(ord('A') + mt_rand(0, 24));
+			}
+		 	return($randstring);
+		}
 		
 		function secureURL() {
 			if($this->config('REZGO_FORWARD_SECURE')) {
@@ -418,6 +433,7 @@
 		// remove all attributes from a user-entered field
 		function cleanAttr($request) {
 			$r = preg_replace("/<([a-z][a-z0-9]*)[^>]*?(\/?)>/i",'<$1$2>', $request);
+			$r = strip_tags($r, '<br><strong><p>');
 			return $r;
 		}
 		
@@ -455,9 +471,7 @@
 		// ------------------------------------------------------------------------------
 		function sendTo($path) {
 			$this->debug('PAGE FORWARDING ('.$path.')');
-			echo '<script>
-				'.REZGO_FRAME_TARGET.'.location.href = "'.$path.'";
-			</script>';
+			echo '<script>'.REZGO_FRAME_TARGET.'.location.href = "'.$path.'";</script>';
 			exit;
 		}
 		
@@ -469,6 +483,7 @@
 			$str = str_replace(" ", "-", $str);
 			$str = preg_replace('/[^A-Za-z0-9\-]/','', $str);
 			$str = preg_replace('/[\-]+/','-', $str);
+			if(!$str) $str = urlencode($string);
 			return strtolower($str);	
 		}
 		
@@ -491,7 +506,9 @@
 		function checkSecure() {
 			if((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443) {
 				return true;
-			} else { return false; }
+			} else { 
+				return false; 
+			}
 		}
 		
 		function setSecureXML($set) {
@@ -510,12 +527,12 @@
 					} else {
 						$request = $_SERVER['REQUEST_URI'];
 					}
-					
+				
 					$this->sendTo($this->secure.$this->secureURL().$request); 
 				} 
 			} else { 
 				// switch to non-https on the current domain
-				if($this->checkSecure() && REZGO_ALL_SECURE !== 1) { 			
+				if($this->checkSecure() && REZGO_ALL_SECURE !== 1) {
 					$this->sendTo($this->secure.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
 				} 
 			}
@@ -523,7 +540,7 @@
 		
 		// ------------------------------------------------------------------------------
 		// fetch a requested template from the templates directory and load it into a
-		// variable for display.  If fullpath is set, fetch it from that location instead.
+		// variable for display.	If fullpath is set, fetch it from that location instead.
 		// ------------------------------------------------------------------------------
 		function getTemplate($req, $fullpath=false) {
 			reset($GLOBALS);
@@ -542,15 +559,16 @@
 			
 			$filename = ($fullpath) ? $req : $path.$req.$ext;
 			
-			if (is_file($filename)) {
-        ob_start();
-        include $filename;
-        $contents = ob_get_contents();
-        ob_end_clean();
-    	} else {
-    		$this->error('"'.$req.'" file not found'.(($fullpath) ? '' : ' in "'.$path.'"'));
-    	}
-    	return $contents;
+			if(is_file($filename)) {
+				ob_start();
+				include $filename;
+				$contents = ob_get_contents();
+				ob_end_clean();
+			} else {
+				$this->error('"'.$req.'" file not found'.(($fullpath) ? '' : ' in "'.$path.'"'));
+			}
+			
+			return $contents;
 		}
 		
 		// ------------------------------------------------------------------------------
@@ -599,12 +617,25 @@
 			$var = base64_encode($enc_text);
 			return str_replace("=", "", base64_encode($var.'|'.$var));
 		}
-	
 		function decode($enc_text, $iv_len = 16) {
 			$var = base64_decode($enc_text.'=');
 			$var = explode("|", $var);
 			return base64_decode($var[0]);
 		}
+ 
+		// ------------------------------------------------------------------------------
+		// encode trans numbers for waivers
+		// ------------------------------------------------------------------------------
+		function waiver_encode($string) {
+			$key = hash('sha256', 'rz|key');
+			$iv = substr( hash('sha256', 'rz|secret'), 0, 16 );
+			return base64_encode( openssl_encrypt( $string, 'AES-256-CBC', $key, 0, $iv));
+		}
+		function waiver_decode( $string ) {
+			$key = hash( 'sha256', 'rz|key' );
+			$iv = substr( hash( 'sha256', 'rz|secret' ), 0, 16 );
+			return openssl_decrypt( base64_decode( $string ), 'AES-256-CBC', $key, 0, $iv );
+		} 
 		
 		// ------------------------------------------------------------------------------
 		// Make an API request to Rezgo. $i supports all arguments that the API supports
@@ -628,7 +659,7 @@
 			// attempt to filter out any junk data
 			$file = strstr($file, '<response');
 			
-			$this->get = utf8_encode($file);
+			$this->get = $file;
 			
 			if($this->config('REZGO_DISPLAY_RESPONSES')) {
 				echo '<textarea>'.$this->get.'</textarea>';
@@ -640,7 +671,7 @@
 				
 				foreach(libxml_get_errors() as $error) {
 					$error_set .= '<br>ERROR: '.$error->message;
-			  }
+				}
 				$this->error('FATAL ERROR WITH XML PARSER ('.$i.') '.$error_set);
 				
 				// there has been a fatal error with the API, report the error to the gateway
@@ -662,8 +693,13 @@
 					$arg = ($this->company_index) ? '&q='.$this->company_index : '';
 					$query = $this->secure.$this->xml_path.'&i=company'.$arg;
 					
-					if($arguments == 'voucher') $query .= '&a=voucher';
-					elseif($this->config('REZGO_MOBILE_XML')) $query .= '&a=mobile';
+					if($arguments == 'voucher') { 
+						$query .= '&a=voucher';
+					} elseif($arguments == 'ticket') {
+						$query .= '&a=ticket';
+					} elseif($this->config('REZGO_MOBILE_XML')) {
+						$query .= '&a=mobile';
+					}
 					
 					$xml = $this->fetchXML($query);
 					
@@ -756,7 +792,6 @@
 			if($i == 'search_bookings') {
 				if(!$this->search_bookings_response[$this->bookings_index]) {
 					$query = $this->secure.$this->xml_path.'&i=search_bookings&'.$this->bookings_index;
-				
 					$xml = $this->fetchXML($query);
 					
 					$c = 0;
@@ -802,6 +837,29 @@
 					}
 				}
 			}
+			// !i=add gift card
+			if($i == 'addGiftCard') {
+
+				$query = 'https://'.$this->xml_path;
+
+				$post = $this->api_post_string.urlencode('<instruction>add_card</instruction>'.$arguments.'</request>');
+
+				$xml = $this->fetchXML($query, $post);
+				
+				if($xml) {
+					$this->commit_response = new stdClass();
+
+					foreach ($xml as $k => $v) {
+						$this->commit_response->$k = trim((string)$v);	
+					}
+				}
+			}
+			// !i=search gift card
+			if($i == 'searchGiftCard') {
+				$query = $this->secure.$this->xml_path.'&i=cards&q='.$arguments;
+				$res = $this->fetchXML($query);
+				$this->gift_card = $res;
+			}
 			// !i=contact
 			if($i == 'contact') {
 				$query = 'https://'.$this->xml_path.'&i=contact&'.$arguments;
@@ -809,11 +867,123 @@
 				$xml = $this->fetchXML($query);
 				
 				if($xml) {
+					$this->contact_response = new stdClass();
 					foreach($xml as $k => $v) {
 						$this->contact_response->$k = trim((string)$v);	
 					}
 				}
 			}
+			// !i=tickets
+			if($i == 'tickets') {
+				if(!$this->ticket_response[$arguments]) {
+					$query = $this->secure.$this->xml_path.'&i=tickets&q='.$arguments;
+					
+					$xml = $this->fetchXML($query);
+					
+					if($xml) {
+						$this->ticket_response[$arguments] = $xml;
+					}	
+				}			
+			}	
+			// !i=waiver
+			if($i == 'waiver') {
+				if(!$this->waiver_response[$arguments]) {
+					
+					if ($advanced == 'com') $target = '&t=com';
+					
+					$query = $this->secure.$this->xml_path.'&i=waiver&q='.$arguments.$target;
+					
+					$xml = $this->fetchXML($query);
+					
+					if($xml) {
+						$this->waiver_response[$arguments] = $xml;
+					}	
+				}			
+			}	
+			// !i=sign
+			if($i == 'sign') {
+
+				$query = 'https://'.$this->xml_path;
+
+				$post = $this->api_post_string.urlencode('<instruction>sign</instruction>'.$arguments.'</request>');
+
+				$xml = $this->fetchXML($query, $post);
+				
+				if($xml) {
+					$this->signing_response = new stdClass();
+
+					foreach ($xml as $k => $v) {
+						$this->signing_response->$k = trim((string)$v);	
+					}
+				}
+			}	
+			// !i=review
+			if($i == 'review') {
+				$query = 'https://'.$this->xml_path.'&i=review&'.$arguments;
+			
+				$xml = $this->fetchXML($query);
+				
+				if($xml) {
+					$this->review_response = new stdClass();
+					$this->review_response = $xml;
+				}
+			}	
+			// !i=add_review
+			if($i == 'add_review') {
+				//$query = 'https://'.$this->xml_path.'&i=add_review&'.$arguments;
+				$query = 'https://'.$this->xml_path;
+
+				$post = $this->api_post_string.urlencode('<instruction>add_review</instruction>'.$arguments.'</request>');
+			
+				$xml = $this->fetchXML($query, $post);
+				
+				if($xml) {
+					$this->review_response = new stdClass();
+					foreach($xml as $k => $v) {
+						$this->review_response->$k = trim((string)$v);	
+					}
+				}
+			}
+			// !i=pickup
+			if($i == 'pickup') {
+				$query = 'https://'.$this->xml_path.'&i=pickup&'.$arguments;
+			
+				$xml = $this->fetchXML($query);
+				
+				if($xml) {
+					$this->pickup_response = new stdClass();
+					$this->pickup_response = $xml;
+				}
+			}	
+			
+			// !i=add_transaction
+			if($i == 'add_transaction') {
+
+				$query = 'https://'.$this->xml_path;
+
+				$post = $this->api_post_string.urlencode('<instruction>add_transaction</instruction>'.$arguments.'</request>');
+
+				$xml = $this->fetchXML($query, $post);
+				
+				if($xml) {
+					$this->commit_response = new stdClass();
+
+					foreach ($xml as $k => $v) {
+						$this->commit_response->$k = trim((string)$v);	
+					}
+				}
+			}
+			// !i=payment
+			if($i == 'payment') {
+				$query = 'https://'.$this->xml_path.'&i=payment&'.$arguments;
+			
+				$xml = $this->fetchXML($query);
+				
+				if($xml) {
+					$this->payment_response = new stdClass();
+					$this->payment_response = $xml;
+				}
+			}	
 			
 			if(REZGO_TRACE_XML) {
 				if(!$query && REZGO_INCLUDE_CACHE_XML) $query = 'called cached response';
@@ -845,7 +1015,7 @@
 		}
 		
 		function setPageTitle($str) {
-			$this->pageTitle = $str;
+			$this->pageTitle = str_replace('_', ' ', $str);
 		}
 		
 		function setMetaTags($str) {
@@ -884,6 +1054,32 @@
 		function getVoucherFooter() {
 			$this->XMLRequest(company, 'voucher');
 			return $this->company_response[0]->footer;
+		}
+		
+		function getTicketHeader() {
+			$this->XMLRequest(company, 'ticket');
+			$header = $this->company_response[0]->header;
+			return $this->tag_parse($header);
+		}
+		
+		function getTicketFooter() {
+			$this->XMLRequest(company, 'ticket');
+			return $this->company_response[0]->footer;
+		}
+
+		function getTicketContent($trans_num) {
+			$this->XMLRequest(tickets, $trans_num);
+			return $this->ticket_response[$trans_num];
+		}
+
+		function getWaiverContent($args=null, $target=null) {
+			$this->XMLRequest(waiver, $args, $target);
+			return $this->waiver_response[$args]->waiver;
+		}
+
+		function getWaiverForms($args=null) {
+			$this->XMLRequest(waiver, $args);
+			return $this->waiver_response[$args]->forms->form;
 		}
 		
 		function getStyles() {
@@ -1009,7 +1205,7 @@
 		function getCalendar($item_id, $date=null) {
 			if(!$date) { // no date? set a default date (today)
 				$date = $default_date = strtotime(date("Y-m-15"));
-				$available = ',available'; // get first available date from month XML
+				$available = ',available'; // get first available date from month API
 			} else {
 				$date = date("Y-m-15", strtotime($date));
 				$date = strtotime($date);
@@ -1028,8 +1224,8 @@
 				}
 			}
 			
-			// update the date with the one provided from the XML response
-			// this is done in case we hopped ahead with the XML search (a=available)
+			// update the date with the one provided from the API response
+			// this is done in case we hopped ahead with the API search (a=available)
 			$date = $xml->year.'-'.$xml->month.'-15';
 			
 			$year = date("Y", strtotime($date));
@@ -1190,7 +1386,22 @@
 		function getCalendarName() {
 			return $this->calendar_name;
 		}
-		
+    
+		function getCalendarDiff($date1, $date2) {
+			// $date1 and $date2 must have format: Y-M-D 
+			
+			$date1 = new DateTime($date1);
+			$date2 = new DateTime($date2);
+			$interval = $date1->diff($date2);
+			
+			$res = ''; 
+			
+			if($interval->y > 0) $res .= $interval->y . ' year' . (($interval->y > 1) ? 's' : '') . (($interval->y > 0)?', ':'');
+			if($interval->m > 0) $res .= $interval->m . ' month' . (($interval->m > 1) ? 's' : '') . (($interval->m > 0)?', ':'');
+			if($interval->d > 0) $res .= $interval->d . ' day' . (($interval->d > 1) ? 's' : '');
+			
+			return $res;
+		}
 		
 		// get a list of tour data
 		function getTours($a=null, $node=null) {
@@ -1212,7 +1423,8 @@
 				$a = ($a) ? $a : 'a=group'.$str;
 			}
 			
-			$promo = ($this->promo_code) ? '&trigger_code='.$this->promo_code : '';		
+			$promo = ($this->promo_code) ? '&trigger_code='.$this->promo_code : '';	
+				
 			$limit = '&limit='.$this->tour_limit;
 			
 			// attach the search as an index including the limit value and promo code
@@ -1225,13 +1437,11 @@
 			return $return;
 		}
 		
-		
-		
 		function getTourAvailability(&$obj=null, $start=null, $end=null) {
 			if(!$obj) $obj = $this->getItem();
 			
 			// check the object, create a list of com ids
-			// search the XML with those ids and the date search
+			// search the API with those ids and the date search
 			// create a list of dates and relevant options to return
 		
 			$loop = (string) $obj->index;
@@ -1240,7 +1450,7 @@
 			$d[] = ($end) ? date("Y-M-d", strtotime($end)) : date("Y-M-d", strtotime($this->requestStr(end_date)));
 			if($d) { $d = implode(',', $d); } else { return false; }
 			
-			if(!$this->tour_availability_response[$loop])  {
+			if(!$this->tour_availability_response[$loop])	{
 				if($this->search_response[$loop]) {
 					foreach((array)$this->search_response[$loop] as $v) {
 						$uids[] = (string)$v->com;
@@ -1281,7 +1491,7 @@
 								$res[(string)$i->com][strtotime((string)$i->date->attributes()->value)]->date = strtotime((string)$i->date->attributes()->value);
 							}
 							
-							// sort by date so the earlier dates always appear first, the xml will return them in that order
+							// sort by date so the earlier dates always appear first, the api will return them in that order
 							// but if the first item found has a later date than a subsequent item, the dates will be out of order
 							ksort($res[(string)$i->com]);
 						}
@@ -1300,6 +1510,13 @@
 			$c=0;
 			$all_required = 0;
 			$valid_count = 0;
+			$strike_prices = array();
+			
+			foreach ($obj->prices->price as $price) {
+				if($price->strike) {
+					$strike_prices[(int) $price->id] = (string) $price->strike;
+				}
+			}
 			
 			if($this->exists($obj->date->price_adult)) {
 				$ret[$c] = new stdClass();
@@ -1309,6 +1526,7 @@
 				if($ret[$c]->required) $all_required++;
 				($obj->date->base_prices->price_adult) ? $ret[$c]->base = (string) $obj->date->base_prices->price_adult : 0;
 				$ret[$c]->price = (string) $obj->date->price_adult;
+				$ret[$c]->strike = $strike_prices[1];
 				$ret[$c++]->total = (string) $obj->total_adult;
 				$valid_count++;
 			}
@@ -1320,6 +1538,7 @@
 				if($ret[$c]->required) $all_required++;
 				($obj->date->base_prices->price_child) ? $ret[$c]->base = (string) $obj->date->base_prices->price_child : 0;
 				$ret[$c]->price = (string) $obj->date->price_child;
+				$ret[$c]->strike = $strike_prices[2];
 				$ret[$c++]->total = (string) $obj->total_child;
 				$valid_count++;
 			}
@@ -1331,6 +1550,7 @@
 				if($ret[$c]->required) $all_required++;
 				($obj->date->base_prices->price_senior) ? $ret[$c]->base = (string) $obj->date->base_prices->price_senior : 0;
 				$ret[$c]->price = (string) $obj->date->price_senior;
+				$ret[$c]->strike = $strike_prices[3];
 				$ret[$c++]->total = (string) $obj->total_senior;
 				$valid_count++;
 			}	
@@ -1348,6 +1568,7 @@
 					$val = 'price'.$i;
 					($obj->date->base_prices->$val) ? $ret[$c]->base = (string) $obj->date->base_prices->$val : 0;
 					$ret[$c]->price = (string) $obj->date->$val;
+					$ret[$c]->strike = $strike_prices[$i];
 					$val = 'total_price'.$i;
 					$ret[$c++]->total = (string) $obj->$val;
 					$valid_count++;
@@ -1355,8 +1576,85 @@
 			}
 			
 			// if the total required count is the same as the total price points, or if no prices are required
-			// we want to set the all_required flag so that the parser won't display individual required marks
-			if($all_required == $valid_count || $all_required == 0) $this->all_required = 1;
+			// we want to set the all_required flag so that the parser won't display individual required marks			
+			if($all_required == $valid_count || $all_required == 0) {
+				$this->all_required = 1;
+			} else {
+				$this->all_required = 0;
+			}			
+			
+			return (array) $ret;
+		}
+		
+		function getTourBundles(&$obj=null) {
+			
+			if(!$obj) $obj = $this->getItem();
+			$com = (string) $obj->com;
+			
+			$c = 0;
+			
+			if($this->exists($obj->bundles->bundle->name)) {
+					
+				$bundle_prices = array();
+				
+				foreach ($obj->bundles->bundle as $bundle) {
+					
+					$ret[$c] = new stdClass();
+					
+					$ret[$c]->id = $c + 1;
+					$ret[$c]->name = $bundle->name;
+					
+					$ret[$c]->label = $this->seoEncode($bundle->name);
+					
+					$ret[$c]->price = $bundle->price;
+					$ret[$c]->visible = $bundle->visible;
+					$ret[$c]->pax = $bundle->pax;
+					
+					unset($bundle_prices);
+					$bundle_makeup = '';
+					$bundle_total = 0;
+					
+					foreach ($bundle->pax->price as $count) {
+						
+						$bundle_total += (int) $count;
+												
+						if ($count['id'] == 1) {
+							
+							$bundle_makeup .= $count . ' ' . $obj->adult_label . ', ';
+							$bundle_prices['adult'] = (string) $count;
+							
+						} elseif ($count['id'] == 2) {
+							
+							$bundle_makeup .= $count . ' ' . $obj->child_label . ', ';
+							$bundle_prices['child'] = (string) $count;
+							
+						} elseif ($count['id'] == 3) {
+							
+							$bundle_makeup .= $count . ' ' . $obj->senior_label . ', ';
+							$bundle_prices['senior'] = (string) $count;
+							
+						} else {
+							
+							$price_label = 'price'.$count['id'].'_label';
+							$bundle_makeup .= $count . ' ' . $obj->$price_label . ', ';
+							$bundle_prices['price'.$count['id']] = (string) $count;
+							
+						}
+						
+					}
+						
+					$bundle_makeup = rtrim($bundle_makeup, ', ');
+					$ret[$c]->makeup = $bundle_makeup;
+					
+					$ret[$c]->prices = $bundle_prices;
+					
+					$ret[$c]->total = $bundle_total;
+					
+					$c++;
+					
+				}
+				
+			}
 			
 			return (array) $ret;
 		}
@@ -1428,6 +1726,9 @@
 					$ret[$c] = new stdClass();
 					
 					$ret[$c]->com = $v->com;
+					$ret[$c]->image = $v->image;
+					$ret[$c]->starting = $v->starting;
+					$ret[$c]->overview = $v->overview;
 					$ret[$c++]->name = $v->name;
 				}
 				return (array) $ret;
@@ -1487,8 +1788,15 @@
 								$res[$type][(string)$f->id]->options[] = $v;
 							}
 						}
+						
+						if((string)$f->options_instructions) {
+							$opt_inst = explode(",", (string)$f->options_instructions);
+							foreach((array)$opt_inst as $v) {
+								$res[$type][(string)$f->id]->options_instructions[] = $v;
+							}
+						}
+						
 					}
-								
 					
 				}
 				
@@ -1681,7 +1989,8 @@
 					if((string)$v->email_address) { $present = 1; break; }
 					if((string)$v->total_forms > 0) { $present = 1; break; }
 				}
-				if(!$present) unset($ret);
+				
+				// if(!$present) unset($ret);
 			}
 			
 			return (array) $ret;				
@@ -1761,7 +2070,7 @@
 		function sendBooking($var=null, $arg=null) {
 			$r = ($var) ? $var : $_REQUEST;
 			
-			if($arg) $res[] = $arg; // extra XML options
+			if($arg) $res[] = $arg; // extra API options
 			
 			($r['date']) ? $res[] = 'date='.urlencode($r['date']) : 0;
 			($r['book']) ? $res[] = 'book='.urlencode($r['book']) : 0;
@@ -1822,6 +2131,10 @@
 			
 			($r['agree_terms']) ? $res[] = 'agree_terms='.urlencode($r['agree_terms']) : 0;
 			
+			($r['review_sent']) ? $res[] = 'review_sent='.urlencode($r['review_sent']) : 0;
+			
+			($r['marketing_consent']) ? $res[] = 'marketing_consent='.urlencode($r['marketing_consent']) : 0;
+			
 			// add in external elements
 			($this->refid) ? $res['refid'] = '&refid='.$this->refid : 0;
 			($this->promo_code) ? $res['promo'] = '&trigger_code='.$this->promo_code : 0;
@@ -1842,7 +2155,7 @@
 		function sendBookingOrder($var=null, $arg=null) {
 			$r = ($var) ? $var : $_REQUEST;
 			
-			if($arg) $res[] = $arg; // extra XML options
+			if($arg) $res[] = $arg; // extra API options
 			
 			if(!is_array($r['booking'])) $this->error('sendBookingOrder failed. Booking array was not found', 1);
 			
@@ -1907,6 +2220,15 @@
 					$res[] = '</tour_forms>';
 				}
 				
+				if($b['pickup']) {
+					
+					$pickup_split = explode("-", stripslashes($b['pickup']));
+					
+					$res[] = '<pickup>'.$pickup_split[0].'</pickup>';
+					if($pickup_split[1]) $res[] = '<pickup_source>'.$pickup_split[1].'</pickup_source>';
+					
+				}
+				
 				$res[] = '</booking>';
 				
 			} // cart loop
@@ -1937,6 +2259,10 @@
 			
 			($r['agree_terms']) ? $res[] = '<agree_terms>'.$r['agree_terms'].'</agree_terms>' : 0;
 			
+			($r['review_sent']) ? $res[] = '<review_sent>'.$r['review_sent'].'</review_sent>' : 0;
+			
+			($r['marketing_consent']) ? $res[] = '<marketing_consent>'.$r['marketing_consent'].'</marketing_consent>' : 0;
+			
 			// add in external elements
 			($this->refid) ? $res[] = '<refid>'.$this->refid.'</refid>' : 0;
 			($this->promo_code) ? $res[] = '<trigger_code>'.$this->promo_code.'</trigger_code>' : 0;
@@ -1944,7 +2270,16 @@
 			// add in requesting IP
 			$res[] = '<ip>'.$_SERVER["REMOTE_ADDR"].'</ip>';
 			
+			// GIFT-CARD
+			$res[] = '<expected>'.$r['expected'].'</expected>';
+			($r['gift_card']) ? $res[] = '<gift_card>'.$r['gift_card'].'</gift_card>' : 0;
+			
 			$res[] = '</payment>';
+			
+			// ticketguardian
+			($r['tour_tg_insurance_coverage']) ? $res[] = '<tg>'.$r['tour_tg_insurance_coverage'].'</tg>' : 0;
+			
+			($r['waiver']) ? $res[] = '<waiver>'.str_replace('data:image/png;base64,', '', $r['waiver']).'</waiver>' : 0;
 			
 			$request = implode('', $res);
 			
@@ -1952,7 +2287,129 @@
 			
 			return $this->commit_response;
 		}
-		
+
+		// ------------------------------------------------------------------------------
+		// GIFT CARD
+		// ------------------------------------------------------------------------------
+		function sendGiftOrder($request=null) {
+			$r = $request;
+			$res = array();
+
+			if($r['rezgoAction'] != 'addGiftCard') {
+				$this->error('sendGiftOrder failed. Card array was not found', 1);
+			}
+			
+			$res[] = '<card>';
+				$res[] = '<number></number>';
+				// AMOUNT
+				if($r['billing_amount'] == 'custom') {
+					$amnt = $r['custom_billing_amount'];
+				}
+				else {
+					$amnt = $r['billing_amount'];
+				}
+				$res[] = '<amount>'.$amnt.'</amount>';
+				$res[] = '<cash_value></cash_value>';
+				$res[] = '<expires></expires>';
+				$res[] = '<max_uses></max_uses>';
+				// NAME
+				$recipient_name = explode(" ", $r['recipient_name'], 2);
+				$res[] = '<first_name>'.$recipient_name[0].'</first_name>';
+				$res[] = '<last_name>'.$recipient_name[1].'</last_name>';
+				$res[] = '<email>'.$r['recipient_email'].'</email>';
+				// MSG
+				$res[] = '<message>'.urlencode(htmlspecialchars_decode($r['recipient_message'], ENT_QUOTES)).'</message>';
+				
+				$res[] = '<send>1</send>';
+				$res[] = '<payment>';
+					$res[] = '<token>'.$r['gift_card_token'].'</token>';
+					$res[] = '<first_name>'.$r['billing_first_name'].'</first_name>';
+					$res[] = '<last_name>'.$r['billing_last_name'].'</last_name>';
+					$res[] = '<address_1>'.$r['billing_address_1'].'</address_1>';
+					$res[] = '<address_2>'.$r['billing_address_2'].'</address_2>';
+					$res[] = '<city>'.$r['billing_city'].'</city>';
+					$res[] = '<state>'.$r['billing_stateprov'].'</state>';
+					$res[] = '<country>'.$r['billing_country'].'</country>';
+					$res[] = '<postal>'.$r['billing_postal_code'].'</postal>';
+					$res[] = '<phone>'.$r['billing_phone'].'</phone>';
+					$res[] = '<email>'.$r['billing_email'].'</email>';
+					if($r['terms_agree'] == 'on') {
+						$res[] = '<agree_terms>1</agree_terms>';
+					} 
+					else {
+						$res[] = '<agree_terms>0</agree_terms>';
+					}
+					$res[] = '<ip>'.$_SERVER['REMOTE_ADDR'].'</ip>';
+				$res[] = '</payment>';
+			$res[] = '</card>';
+
+			$request = implode('', $res);
+			
+			$this->XMLRequest('addGiftCard', $request, 1);
+
+			return $this->commit_response;
+		}		
+
+		// ------------------------------------------------------------------------------
+		// Sign Waiver
+		// ------------------------------------------------------------------------------
+		function signWaiver($request=null) {
+			$r = ($request) ? $request : $_REQUEST;
+			$res = array();
+			
+			$birthdate = $r['pax_birthdate']['year'].'-'.sprintf('%02d', $r['pax_birthdate']['month']).'-'.sprintf('%02d', $r['pax_birthdate']['day']);
+			
+			if ($r['pax_type'] != 'general') {
+			
+				$pax_forms = $r['pax_group'][$r['pax_type']][$r['pax_type_num']]['forms'];
+				
+				foreach((array) $pax_forms as $form_id => $form_answer) {
+					if(is_array($form_answer)) { // for multiselects
+						$form_answer = implode(', ', $form_answer); 
+						$r['pax_group'][$r['pax_type']][$r['pax_type_num']]['forms'][$form_id] = $form_answer;
+					}
+				}
+			
+			}
+			
+			$group_forms = serialize($r['pax_group']);
+			
+			$res[] = '<sign>';
+				$res[] = '<type>pax</type>'; // change to dynamic later
+				$res[] = '<child>'.$r['child'].'</child>';
+				$res[] = '<pax_type>'.$r['pax_type'].'</pax_type>';
+				$res[] = '<pax_type_num>'.$r['pax_type_num'].'</pax_type_num>';
+				$res[] = '<order_code>'.$r['order_code'].'</order_code>';
+				$res[] = '<trans_num>'.$r['trans_num'].'</trans_num>';
+				$res[] = '<item_id>'.$r['pax_item'].'</item_id>';
+				$res[] = '<pax_id>'.$r['pax_id'].'</pax_id>';
+				$res[] = '<first_name>'.$r['pax_first_name'].'</first_name>';
+				$res[] = '<last_name>'.$r['pax_last_name'].'</last_name>';
+				$res[] = '<phone_number>'.$r['pax_phone'].'</phone_number>';
+				$res[] = '<email_address>'.$r['pax_email'].'</email_address>';
+				$res[] = '<birthdate>'.$birthdate.'</birthdate>';
+				$res[] = '<group_forms>'.$group_forms.'</group_forms>';
+				$res[] = '<waiver_text>'.$r['pax_waiver_text'].'</waiver_text>';
+				$res[] = '<signature>'.str_replace('data:image/png;base64,', '', $r['pax_signature']).'</signature>';
+			$res[] = '</sign>';
+           
+			$request = implode('', $res);   //echo "<script> console.log($request); </script>";
+			
+			$this->XMLRequest('sign', $request, 1);
+
+			return $this->signing_response;
+		}		
+
+		function getGiftCard($request=null) {
+			if(!$request) {
+				$this->error('No search argument provided, expected card number');
+			}
+
+			$this->XMLRequest('searchGiftCard', $request);
+
+			return $this->gift_card;
+		}
+
 		// this function is for sending a partial commit request, it does not add any values itself
 		function sendPartialCommit($var=null) {
 			$request = '&'.$var;
@@ -1962,6 +2419,7 @@
 			return $this->commit_response;
 		}
 		
+		// send results of contact form
 		function sendContact($var=null) {
 			$r = ($var) ? $var : $_REQUEST;
 			
@@ -1976,14 +2434,56 @@
 			($r['city']) ? $res[] = 'city='.urlencode($r['city']) : 0;
 			($r['state_prov']) ? $res[] = 'state_prov='.urlencode($r['state_prov']) : 0;
 			($r['country']) ? $res[] = 'country='.urlencode($r['country']) : 0;
-			
+
 			$request = '&'.implode('&', $res);
-			
+
 			$this->XMLRequest(contact, $request);
-			
+
 			return $this->contact_response;
 		}
 		
+		// get review data
+		function getReview($q=null, $type=null, $limit=null ) {
+			
+			// 'type' default is booking // 'limit' default is 5
+			
+			($q) ? $res[] = 'q='.urlencode($q) : 0;	
+			($type) ? $res[] = 'type='.urlencode($type) : 0;	
+			($limit) ? $res[] = 'limit='.urlencode($limit) : 0;		
+			
+			$request = implode('&', $res);
+
+			$this->XMLRequest(review, $request);
+
+			return $this->review_response;
+		}
+		
+		// get pickup list
+		function getPickupList($option_id=null) { 
+			
+			($option_id) ? $res[] = 'q='.urlencode($option_id) : 0;		
+			
+			$request = implode('&', $res);
+
+			$this->XMLRequest(pickup, $request);
+
+			return $this->pickup_response;
+		}
+		
+		// get pickup location
+		function getPickupItem($option_id=null, $pickup_id=null) { 
+			
+			($option_id) ? $res[] = 'q='.urlencode($option_id) : 0;	
+			($pickup_id) ? $res[] = 'pickup='.urlencode($pickup_id) : 0;	
+			
+			$request = implode('&', $res);
+
+			$this->XMLRequest(pickup, $request);
+
+			return $this->pickup_response->pickup;
+		}
+		
+
 		// add an item to the shopping cart
 		function addToCart($item, $clear=0) {
 			
@@ -2041,6 +2541,28 @@
 			return $cart;
 		}
 		
+		// add pickup to the shopping cart
+		function pickupCart($index, $pickup) {
+			
+			// load the existing cart
+			if($_SESSION['rezgo_cart_'.REZGO_CID]) { $cart = $_SESSION['rezgo_cart_'.REZGO_CID]; }
+			elseif($_COOKIE['rezgo_cart_'.REZGO_CID]) { $cart = unserialize(stripslashes($_COOKIE['rezgo_cart_'.REZGO_CID])); }
+				
+			if($cart[$index]) {
+				
+				$cart[$index]['pickup'] = $pickup;
+			
+				// update cart
+				$ttl = (REZGO_CART_TTL > 0 || REZGO_CART_TTL === 0) ? REZGO_CART_TTL : 86400;
+				setcookie("rezgo_cart_".REZGO_CID, serialize($cart), time() + $ttl, '/', $_SERVER['SERVER_NAME']);
+				
+				$this->setShoppingCart(serialize($cart));
+			
+			}
+			
+			return $cart;
+		}
+		
 		function clearCart() {
 			unset($_SESSION['rezgo_cart_'.REZGO_CID]);
 			unset($_COOKIE['rezgo_cart_'.REZGO_CID]);
@@ -2080,11 +2602,11 @@
 						$a .= '<price7_num>'.$v['price7_num'].'</price7_num>';
 						$a .= '<price8_num>'.$v['price8_num'].'</price8_num>';
 						$a .= '<price9_num>'.$v['price9_num'].'</price9_num>';
+						$a .= '<pickup>'.$v['pickup'].'</pickup>';
 					$a .= '</item>';
 					
 					$cart_ids[] = $k; // translate cart ID for the output below
 				}
-
 				$promo = ($this->promo_code) ? '<trigger_code>'.$this->promo_code.'</trigger_code>' : '';		
 				
 				// attach the search as an index including the limit value and promo code
@@ -2137,5 +2659,29 @@
 			
 		}
 		
+		// FORMAT CARD
+		function cardFormat($num) {
+			$cc = str_replace(array('-', ' '), '', $num);
+			$cc_length = strlen($cc);
+			$new_card = substr($cc, -4);
+
+			for ($i = $cc_length - 5; $i >= 0; $i--) {
+				if((($i + 1) - $cc_length) % 4 == 0) {
+					$new_card = '-' . $new_card;
+				}
+
+				$new_card = $cc[$i] . $new_card;
+			}
+
+			return $new_card;
+		}		
+
+		// ------------------------------------------------------------------------------
+		// CLEAR PROMO CODE
+		// ------------------------------------------------------------------------------
+		function resetPromoCode() {
+			unset($_REQUEST['promo']);
+			unset($_SESSION['rezgo_promo']);
+			setcookie('rezgo_promo', '', time() - 3600, '/', $_SERVER['SERVER_NAME']);
+		}
 	}
-	

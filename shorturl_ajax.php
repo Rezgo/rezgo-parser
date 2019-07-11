@@ -4,9 +4,13 @@
 	// url shortening api call (bit.ly, tinyurl, etc)
 	//  &#10549;
 
-	if($_REQUEST[url]) {
+	if($_REQUEST['url']) {
 		$url = file_get_contents('http://rezgo.me/api?format=simple&action=shorturl&url='.urlencode($_REQUEST[url]));
-		//echo '<span id="rezgo-short-url-label">Quick link to this page</span><br />'.$url;
-		echo '<span id="rezgo-short-url-label">Quick link to this page</span><br /><input type="text" id="rezgo-short-url" class="form-control" onclick="this.select();" value="'.$url.'" />';
+		if ($_REQUEST['page'] == 'waiver') {
+			$message = 'Share link with other members in your group';
+		} else {
+			$message = 'Quick link to this page';
+		}
+		echo '<span id="rezgo-short-url-label">'.$message.'</span><br /><input type="text" id="rezgo-short-url" class="form-control" onclick="this.select();" value="'.$url.'" />';
 	}
 ?>
