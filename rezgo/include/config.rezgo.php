@@ -138,11 +138,4 @@
 	// Display the API responses inline with the regular page content
 	define(	"REZGO_DISPLAY_RESPONSES",		0																						);
 
-	// Use the test url for ticket guardian calls
-	// define(	"REZGO_TICKGUARDIAN_TEST",		0																						);
-	// //live keys
-	// define(	"REZGO_TICKGUARDIAN_PK",		"pk_live_8d59f0f5602ebcee793e2f1669332b9cbfe49a8e");
-	// define(	"REZGO_TICKGUARDIAN_SK",		"sk_live_853b3555298c0f3200a4c06a9b8f3888b03edc73");
-	// }
-
 ?>
