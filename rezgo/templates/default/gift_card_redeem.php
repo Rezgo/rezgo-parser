@@ -339,17 +339,13 @@ function gcUpdatePaymentSection(t) {
 		$('#payment_info_head').show();
 		$('#payment_info').show();
 		$('.terms_credit_card_over_zero').show();
-		<?php if($tg_enabled) {?>
-				tg_enable_widget();
-		<?}?>
+		
 	}
 	else {
 		$('#payment_info_head').hide();
 		$('#payment_info').hide();
 		$('.terms_credit_card_over_zero').hide();
-		<?php if($tg_enabled) {?>
-			tg_disable_widget();
-		<?}?>
+		
 	}
 }
 gcReset = function() {
