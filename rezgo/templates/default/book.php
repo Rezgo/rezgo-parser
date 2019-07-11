@@ -15,11 +15,6 @@
 	// non-open date date_selection elements
 	$date_types = array('always', 'range', 'week', 'days', 'single'); // centralize this?
 
-	//ticket gaurdian values
-	$tg_supported_currencies = array('USD', 'CAD', 'GBP', 'AUD', 'MXN', 'JPY', 'BRL', 'EUR');
-	//$tg_supported_locale = array('en_US', 'en_CA', 'en_GB', 'en_AU', 'es_MX'); //TODO:Use site settings to set the widget language
-	$tg_display_currency = 0;
-	$tg_enabled = 0;
 ?>
 
 <link rel="stylesheet" href="<?php echo $site->path;?>/css/intlTelInput.css" />
@@ -63,8 +58,6 @@
 	var form_symbol = '$';
 	var form_decimals = '2';
 	var form_separator = ',';
-	var tg_booking_prices = new Array();
-	var tg_booking_prices_total = 0;
 </script>
 
 <script>
@@ -825,102 +818,9 @@
 									<div class="clearfix visible-xs"></div>
 								</div>
 							</div>
-							<?
+							<?php
 								$site_base_currency = strtoupper($site->getBookingCurrency());
-
-								if(in_array($site_base_currency, $tg_supported_currencies) && $company->ticketguardian) {
-									$tg_display_currency = $site_base_currency;
-								}
-
-								if(($company->ticketguardian) && ($tg_display_currency !== 0) && ($site->getGateway())) {
-									$tg_enabled = 1;
-								}
-
 							?>
-							<script>
-							//tg item prices for quote
-								tg_booking_prices = split_total.slice(0);
-								tg_booking_prices_total = tg_booking_prices.reduce(function(acc, val) { return acc + val; }, 0);
-							</script>
-
-							<!-- TICKET GUARDIAN -->
-							<?php if($tg_enabled) {?>
-							<div id="rezgo-ticket-guardian" class="form-group" style="display:none;">
-								<div class="row rezgo-form-group rezgo-booking">
-									<div class="col-xs-12">
-										<h3 class="text-info">
-											<span>Protect Your Booking With <span><img class="tg_logo" src="<?php echo $site->path;?>/img/ticketguardian/TOURS-TGmirr-logo.png"/></span><span id="tg_recommended">(recommended)</span></span>
-										</h3>
-										<div id="tg_loader"><center>Loading Quote... <i class="fa fa-circle-o-notch fa-spin"></i></center></div>
-										<div id="ticket_guardian" style="display:none;">
-											<div id="tg-accept">
-												<div class="rezgo-form-row">
-													<div class="col-xs-8">
-														<label id="tg_accept_label"><input type="radio" name="tg_selection" id="tg_selection" value="true"><span>&nbsp;&nbsp;</span>Yes, protect my booking</label>
-													</div>
-													<div class="col-xs-4">
-														<strong class="rezgo-item-total" id="rezgo-tg-quote"></strong>
-													</div>
-												</div>
-												<div class="form-group" id="tg_protect_list">
-													<div class="rezgo-form-row">
-														<div class="col-xs-12" >
-																<span class="col-xs-12">Protect against:</span>
-																<div class="col-xs-12" >
-																	<span class="col-xs-6"><img class="tg_widget_icons" src="<?php echo $site->path;?>/img/ticketguardian/TSH-IC-8.png">Illness & Health</span>
-																	<span class="col-xs-6"><img class="tg_widget_icons" src="<?php echo $site->path;?>/img/ticketguardian/TSH-IC-10.png">Military or Jury Duty</span>
-																	<span class="col-xs-6"><img class="tg_widget_icons" src="<?php echo $site->path;?>/img/ticketguardian/TSH-IC-9.png">Weather</span>
-																	<span class="col-xs-6"><img class="tg_widget_icons" src="<?php echo $site->path;?>/img/ticketguardian/TSH-IC-6.png">Family Emergencies</span>
-																	<span class="col-xs-6"><img class="tg_widget_icons" src="<?php echo $site->path;?>/img/ticketguardian/TSH-IC-2.png">Traffic Accidents</span>
-																	<span class="col-xs-6"><img class="tg_widget_icons" src="<?php echo $site->path;?>/img/ticketguardian/TSH-IC-14.png">Work Travel Conflicts</span>
-																</div>
-																<span class="col-xs-12">Get a full refund (minus premium) and peace of mind</span>
-														</div>
-													</div>
-												</div>
-												<div class="rezgo-form-row">
-													<div class="col-xs-12">
-														<div class="col-xs-12" id="tg_terms"><a href="javascript:void(0);" title="Terms and Conditions" onclick="window.open('https://www.ticketguardian.net/standard-protection-tc','ticketguardian','location=0,menubar=0,resizable=1,titlebar=0,toolbar=0,status=0,scrollbars=1,width=750,height=320');">Click here for terms and conditions</a></div>
-													</div>
-												</div>
-												<div class="rezgo-form-row">
-													<div class="col-xs-12">
-														<div class="col-xs-12 tg_sub_text" id="tg_protected_by">Protected by TourShield Administered by FanShield LLC. Please see individual policy for underwriter details</div>
-													</div>
-												</div>
-												<div class="rezgo-form-row">
-													<div class="col-xs-12">
-														<div class="col-xs-12 tg_sub_text" id="tg_help_block"><span>I understand that my personal information including credit card will be shared with TourShield for the purposes of purchasing ticket protection.</span></div>
-													</div>
-												</div>
-											</div>
-											<div id="tg-decline">
-												<div class="form-group">
-													<div class="rezgo-form-row">
-														<div class="col-xs-12">
-															<label id="tg_decline_label"><input type="radio" name="tg_selection" id="tg_selection" value="false"><span>&nbsp;&nbsp;</span>No, I'm willing to take the risk and understand it isn't available after booking </label>
-														</div>
-													</div>
-												</div>
-												<div class="form-group">
-													<div class="rezgo-form-row">
-														<div class="col-xs-12" id="tg-decline-sub">
-															<div class="col-xs-12">
-																<span><i class="fa fa-clock-o"></i>&nbsp;Don't miss out!</span> Not available after booking
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-										<input type="hidden" name="tour_tg_insurance_coverage" id="tour_tg_insurance_coverage"/>
-									</div>
-								</div>
-							</div>
-							<hr>
-						  <?php } //end if($tg_display_currency != 0)?>
-
-
 							<!-- BILLING INFO -->
 							<div class="rezgo-billing-wrp">
 								<div class="row rezgo-form-group rezgo-booking">
@@ -1733,130 +1633,6 @@
 
 	}
 
-	<?php if($tg_enabled) { ?>
-
-		function tg_configure_widget(prices) {
-				var booking_prices = prices.filter(Boolean);
-				var arr_price = tg_clean_price_items(booking_prices)
-				var price_total = arr_price.reduce(function(acc, val) { return acc + val; }, 0);
-				$("#rezgo-ticket-guardian").hide();
-					if(price_total >= 25 && price_total < 2500 && overall_total > 0) {
-						getQuote()
-						toggleCard();
-					} else {
-						tg_disable_widget();
-					}
-		}
-
-		function getQuote() {
-			$.ajax({
-				url: '<?php echo $site->base?>/ticket_guardian_ajax.php',
-				dataType:"json",
-				data: {
-					action: "quote",
-					quote_data: {
-						items: build_quote_data(),
-						currency: '<?php echo  $tg_display_currency ?>',
-					},
-				},
-				success: function(responseText) {
-					$("#tg_loader").hide();
-					$("#ticket_guardian").show();
-					$("#rezgo-tg-quote").text(responseText.currency+" "+responseText.symbol+responseText.total);
-				},
-				error: function() {
-					var body = 'Sorry, the system has suffered an error that it can not recover from.<br><br>Please try again later.<br />';
-					$('#rezgo-book-message-body').html(body);
-					$('#rezgo-book-message-body').addClass('alert alert-warning');
-				}
-			});
-		}
-
-		$("#ticket_guardian input[name='tg_selection']").click(function(){
-	    if($('input:radio[name=tg_selection]:checked').val() == "true"){
-        opt_in_functions();
-	    } else {
-				opt_out_functions();
-			}
-		});
-
-		function build_quote_data() {
-			var quote_data = [];
-			var booking_prices = tg_booking_prices.filter(Boolean);
-			var arr_price = tg_clean_price_items(booking_prices);
-
-			for (var i = 0; i < arr_price.length; i++) {
-				var item = {};
-				item.name = "item_"+i;
-				item.reference_number = "item_"+i;
-				item.cost = arr_price[i];
-
-				quote_data.push(item);
-			}
-			return quote_data;
-		}
-
-		function tg_clean_price_items(tg_prices) {
-			for (var idx = 0; idx < tg_prices.length; idx++) {
-				var p = tg_prices[idx];
-				tg_prices[idx] = clean_money_string(p);
-			}
-
-			return tg_prices;
-		}
-
-		function tg_get_bookings_value() {
-			var booking_prices = tg_booking_prices.filter(Boolean);
-			var arr_price = tg_clean_price_items(booking_prices)
-			var price_total = arr_price.reduce(function(acc, val) { return acc + val; }, 0);
-
-			return price_total;
-		}
-
-		function opt_in_functions() {
-			$("#tour_tg_insurance_coverage").val("true");
-			gcUpdatePaymentSection(overall_total);
-			toggle_payment_methods(false);
-			toggleCard();
-		}
-
-		function opt_out_functions() {
-			$("#tour_tg_insurance_coverage").val("false");
-			gcUpdatePaymentSection(overall_total);
-			toggle_payment_methods(true);
-			toggleCard();
-		}
-
-		function toggle_payment_methods(display) {
-			var payments = $('.rezgo-payment-method');
-			for (var i = 0; i < payments.length; i++) {
-				if(payments[i].id !== 'payment_method_credit') {
-					$(payments[i]).parent().toggle(display);
-				}
-			}
-		}
-
-		function tg_disable_widget() {
-			$("#rezgo-ticket-guardian").hide();
-			$("#tour_tg_insurance_coverage").val("");
-			tg_clear_choice();
-			toggle_payment_methods(true);
-		}
-
-		function tg_clear_choice() {
-			$('input[name="tg_selection"]').prop('checked', false);
-		}
-
-		function tg_enable_widget() {
-			var booking_value = tg_get_bookings_value();
-			if(booking_value >= 25 && booking_value < 2500 && overall_total > 0){
-				$("#rezgo-ticket-guardian").show();
-				getQuote();
-			}
-		}
-
-	<?php } ?>
-
 	function stepForward() {
 		if(!validate_form()) return error_booking();
 
@@ -1887,10 +1663,6 @@
 		$("#tour_email_address").addClass("required");
 		$("#agree_terms").addClass("required");
 		$('#rezgo-book-tabs a:last').tab('show');
-
-		<?php if($tg_enabled){ ?>
-			tg_configure_widget(tg_booking_prices);
-		<?php } ?>
 		
 		// get line items
 		$('.rezgo-line-item-box').each(function() {
@@ -2008,9 +1780,7 @@
 
 			document.getElementById("terms_other").style.display = 'none';
 			document.getElementById("terms_credit_card").style.display = '';
-			<?php if ($tg_enabled){ ?>
-				tg_enable_widget();
-			<?php } ?>
+			
 
 		} else if($('input[name=payment_method]:checked').val() == 'PayPal') {
 			<?php $pmn = 0; ?>
@@ -2027,11 +1797,7 @@
 
 			document.getElementById("terms_credit_card").style.display = 'none';
 			document.getElementById("terms_other").style.display = '';
-			<?php if ($tg_enabled){ ?>
-				if(overall_total > 0) {
-					tg_disable_widget();
-				}
-			<?php } ?>
+			
 
 		} else {
 			<?php $pmn = 0; ?>
@@ -2053,12 +1819,7 @@
 
 			document.getElementById("terms_credit_card").style.display = 'none';
 			document.getElementById("terms_other").style.display = '';
-			<?php if ($tg_enabled){?>
-				if(overall_total > 0) {
-					tg_disable_widget();
-				}
-			<?}?>
-			
+						
 		}
 	}
 
@@ -2177,8 +1938,7 @@
 		total = clean_money_string(total) + add_price;
 		total = total.formatMoney();
 		split_total[order_num] = total;
-		tg_booking_prices = split_total.slice(0);
-		
+				
 		// set running total of extras
 		var total_extras = $("#total_extras_" + order_num).val();
 		total_extras = (total_extras * 1) + (add_price * 1); // multiply by 1 to force number
@@ -2242,8 +2002,7 @@
 		total = clean_money_string(total) - sub_price;
 		total = total.formatMoney();
 		split_total[order_num] = total;
-		tg_booking_prices = split_total.slice(0);
-		
+				
 		// set running total of extras
 		var total_extras = $("#total_extras_" + order_num).val();
 		total_extras = (total_extras * 1) - (sub_price * 1); // multiply by 1 to force number
