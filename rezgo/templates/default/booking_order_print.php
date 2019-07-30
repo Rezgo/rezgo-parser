@@ -1,4 +1,4 @@
-<?
+<?php
 
 	// send the user home if they shouldn't be here
 	if(!$trans_num) $site->sendTo($site->base."/order-not-found:empty");

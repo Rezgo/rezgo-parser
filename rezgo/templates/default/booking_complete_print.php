@@ -1,4 +1,4 @@
-<?
+<?php
 	// grab and decode the trans_num if it was set
 	$trans_num = $site->decode($_REQUEST['trans_num']);
 
@@ -125,7 +125,7 @@
                 <i class="fa fa-map-marker"></i> <?php echo $pickup_detail->location_address;?><br />
                 <?php } ?>
                 
-                <?
+                <?php
                 
                 if($site->exists($pickup_detail->lat) && !REZGO_CUSTOM_DOMAIN) { 
                 
@@ -346,7 +346,7 @@
 									</tr>
 
 									<?php foreach( $site->getBookingLineItems() as $line ) { ?>
-										<?
+										<?php
 											unset($label_add);
 											if($site->exists($line->percent) || $site->exists($line->multi)) {
 												$label_add = ' (';
@@ -435,7 +435,7 @@
                 
 							<?php if ($form->options_instructions) { ?>
             
-                <?
+                <?php
                   $options = explode(',', (string) $form->options);
                   $options_instructions = explode(',', (string) $form->options_instructions);
                   $option_extras = array_combine($options, $options_instructions);
@@ -445,7 +445,7 @@
                 
                   <?php if ( $form->type == 'multiselect' ) { ?>
                   
-                    <?
+                    <?php
                       $multi_answers = explode(',', (string) $form->answer);
                       $multi_answer_list = '';
                       foreach ($multi_answers as $answer) {
@@ -508,7 +508,7 @@
                   
 								<?php if ($form->options_instructions) { ?>
             
-                  <?
+                  <?php
                     $pax_options = explode(',', (string) $form->options);
                     $pax_options_instructions = explode(',', (string) $form->options_instructions);
                     $pax_option_extras = array_combine($pax_options, $pax_options_instructions);
@@ -518,7 +518,7 @@
                   
                     <?php if ( $form->type == 'multiselect' ) { ?>
                       
-                      <?
+                      <?php
                         $pax_multi_answers = explode(',', (string) $form->answer);
                         $pax_multi_answer_list = '';
                         foreach ($pax_multi_answers as $pax_answer) {

@@ -1,4 +1,4 @@
-<?
+<?php
 	if($_REQUEST['rezgoAction'] == 'return') {
 		echo '<script type="text/javascript">parent.creditConfirm("'.$_REQUEST['token'].'");</script>';
 	}

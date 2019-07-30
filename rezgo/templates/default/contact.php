@@ -1,4 +1,4 @@
-<?
+<?php
 	if($_POST['rezgoAction'] == 'contact') {
 		if ($_POST['hp_rezgo'] != '') {
 			$bot_request = TRUE;

@@ -1,4 +1,4 @@
-<?
+<?php
 	$company = $site->getCompanyDetails();
 ?>
 <html>
@@ -94,7 +94,7 @@
           
           <hr />
           
-        <?
+        <?php
       
         } // foreach $site->getBookings() 
         

@@ -1,4 +1,4 @@
-<?
+<?php
 	require('recaptchalib.php');
 	
 	if($_POST['rezgoAction'] == 'contact') {

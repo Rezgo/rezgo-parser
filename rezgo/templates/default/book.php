@@ -1,4 +1,4 @@
-<?
+<?php
 	// handle old-style booking requests
 	if($_REQUEST[uid] && $_REQUEST[date]) {
 		$for_array = array('adult', 'child', 'senior', 'price4', 'price5', 'price6', 'price7', 'price8', 'price9');
@@ -170,7 +170,7 @@
 								</ol>
 							</div>
 
-							<?
+							<?php
 							$c = 0;
 							$cart = $site->getCart(1); // get the cart, remove any dead entries
 							
@@ -181,7 +181,7 @@
 							?>
 							<?php // start cart loop for each tour in the order ?>
 							<?php foreach($cart as $item) { ?>
-								<?
+								<?php
 								$required_fields = 0;
 								$site->readItem($item);
 								?>
@@ -317,7 +317,7 @@
 
 																	<p class="rezgo-form-comment"><span><?php echo $form->instructions?></span></p>
 
-                                  <?
+                                  <?php
 																	if ($form->options_instructions) {
 																		$optex_count = 1;
 																		foreach($form->options_instructions as $opt_extra) {
@@ -342,7 +342,7 @@
 
 																	<p class="rezgo-form-comment"><span><?php echo $form->instructions?></span></p>
 
-                                  <?
+                                  <?php
 																	if ($form->options_instructions) {
 																		$optex_count = 1;
 																		foreach($form->options_instructions as $opt_extra) {
@@ -434,7 +434,7 @@
 															</select>
 															<p class="rezgo-form-comment"><span><?php echo $form->instructions?></span></p>
 
-															<?
+															<?php
                               if ($form->options_instructions) {
 																$optex_count = 1;
                                 foreach($form->options_instructions as $opt_extra) {
@@ -457,7 +457,7 @@
 															</select>
 															<p class="rezgo-form-comment"><span><?php echo $form->instructions?></span></p>
 
-															<?
+															<?php
                               if ($form->options_instructions) {
 																$optex_count = 1;
                                 foreach($form->options_instructions as $opt_extra) {
@@ -533,7 +533,7 @@
                         <label>Choose your pickup location</label>
                         <select class="chosen-select form-control rezgo-pickup-select" name="booking[<?php echo $c?>][pickup]" data-target="rezgo-pickup-detail-<?php echo $c?>" data-id="<?php echo $c?>" data-counter="<?php echo $form_counter?>" data-option="<?php echo $item->uid?>" data-pax="<?php echo $item->pax?>">
                           <option value=""></option>
-													<?
+													<?php
 													
 														foreach($pickup_locations->pickup as $pickup) { 
 															
@@ -689,7 +689,7 @@
 														</td>
 														<td class="rezgo-td-data">
 															<span>
-																<?
+																<?php
 																unset($discount_string);
 																foreach($item->discount_rules->rule as $discount) {
 																	$discount_string .= ($discount_string) ? ', '.$discount : $discount;
@@ -963,7 +963,7 @@
 
 							<!-- WAIVER -->
 							<?php if(!$site->isVendor()) { ?>
-								<?
+								<?php
 								$waiver = 0;
 								$waiver_ids = '';
 								foreach($cart as $item) {
@@ -1031,7 +1031,7 @@
 
 										<div class="rezgo-payment-frame" id="payment_info" style="<?php echo (($complete_booking_total > 0) ? '' : 'display:none;')?>">
 											<div class="form-group" id="payment_methods">
-												<?
+												<?php
 													$card_fa_logos = array(
 														'visa' => 'fa-cc-visa',
 														'mastercard' => 'fa-cc-mastercard',

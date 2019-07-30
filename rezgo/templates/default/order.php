@@ -311,7 +311,7 @@ $date_types = array('always', 'range', 'week', 'days', 'single'); // centralize 
 			</div>
 		<?php } // end if(!$cart) ?>
 
-		<?
+		<?php
 			// build 'share this order' link
 			$pax_nums = array ('adult_num', 'child_num', 'senior_num', 'price4_num', 'price5_num', 'price6_num', 'price7_num', 'price8_num', 'price9_num');
 

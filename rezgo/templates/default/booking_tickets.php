@@ -1,7 +1,7 @@
 <?php $split = explode(",", $_REQUEST['trans_num']); ?>
 
 <?php foreach((array) $split as $v) { ?>
-	<?
+	<?php
 	$trans_num = $site->decode($v);
 	if(!$trans_num) $site->sendTo("/");
 	$booking = $site->getBookings($trans_num, 0);

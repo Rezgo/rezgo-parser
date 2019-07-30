@@ -13,7 +13,7 @@ $ta_key = '2E2B919141464E31B384DE1026A2DE7B';
 
 <div class="tour-details-wrp container-fluid rezgo-container">
 
-<?
+<?php
 $items = $site->getTours('t=com&q='.$_REQUEST['com'].'&f[uid]='.$_REQUEST['option'].'&d='.$_REQUEST['date']);
 
 if(!$items) { ?>
@@ -390,7 +390,7 @@ if(!$items) { ?>
 					<span>&nbsp;</span>
 				</div>
         
-        <?
+        <?php
 				$ref_parts = explode('/?', $_SERVER['HTTP_REFERER']);
 				$promo_form_url = $ref_parts[0];
 				?>
@@ -449,7 +449,7 @@ if(!$items) { ?>
 					<div class="lead" id="rezgo-tour-overview"><?php echo $item->details->overview?></div>
 				<?php } ?>	
 					
-				<?
+				<?php
 					unset($location);
 					if($site->exists($item->location_name)) $location['name'] = $item->location_name;
 					if($site->exists($item->location_address)) $location['address'] = $item->location_address;
@@ -464,7 +464,7 @@ if(!$items) { ?>
 							<span>Location:&nbsp;</span>
 						</label>
 
-						<?
+						<?php
 							if ($location['address'] != '') {
 								echo '
 								'.($location['name'] != '' ? '<span class="rezgo-location-name">'.$location['name'].' - </span>' : '').'

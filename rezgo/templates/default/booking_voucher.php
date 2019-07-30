@@ -1,4 +1,4 @@
-<?
+<?php
 	$split = explode(",", $_REQUEST[trans_num]);
 
 	foreach((array) $split as $v) {
@@ -203,7 +203,7 @@
 		    </div><!-- end .container -->
 		  </div><!-- end #rezgo-voucher-body -->
 			
-		<?
+		<?php
 		
 			echo $site->getVoucherFooter();
 		

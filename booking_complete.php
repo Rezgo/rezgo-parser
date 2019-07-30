@@ -29,7 +29,7 @@
 	
 	<?php echo $site->getTemplate('booking_order')?>
   
-  <?
+  <?php
 		$ga_add_transacton = "
 			ga('ecommerce:addTransaction', {
 				'id': '$trans_num',

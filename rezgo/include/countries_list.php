@@ -1,4 +1,4 @@
-<?
+<?php
 // countries array
 $countries_list = array(	
 	'af' =>	'afghanistan',

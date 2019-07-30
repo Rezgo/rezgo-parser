@@ -1,4 +1,4 @@
-<?
+<?php
 	$company = $site->getCompanyDetails();
 	$availability_title = '';	
 

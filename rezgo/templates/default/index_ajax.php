@@ -31,7 +31,7 @@
 		<p class="lead">Sorry, there were no results for your search.</p>
 	<?php } ?>
 
-	<?
+	<?php
 		$tourList = $site->getTours();
 
 		if($tourList[REZGO_RESULTS_PER_PAGE]) {
@@ -95,7 +95,7 @@
                 </span>
                 <?php } ?>
 								<p>
-									<?
+									<?php
 										$text = strip_tags($item->details->overview);
 										$text = $text." ";
 										$text = substr($text, 0, 200);
@@ -109,7 +109,7 @@
 								</p>
 							</div>
 							<div class="col-sm-12 col-md-4 rezgo-info-left pull-left">
-								<?
+								<?php
 									unset($location);
 									if($site->exists($item->location_name)) $location['name'] = $item->location_name;
 									if($site->exists($item->location_address)) $location['address'] = $item->location_address;
@@ -121,7 +121,7 @@
 								<?php if(count($location) > 0) { ?>
 									<p class="rezgo-list-location">
 										<strong class="text-info" class="rezgo-location-label">Location</strong>
-										<?
+										<?php
 											if($location['address'] != '') {
 												echo '
 												'.($location['name'] != '' ? '<span class="rezgo-location-name">'.$location['name'].' - </span>' : '').'

@@ -87,7 +87,7 @@
 				</tr>
 
 				<?php foreach( $site->getBookingLineItems() as $line ) { ?>
-					<?
+					<?php
 						unset($label_add);
 						if($site->exists($line->percent) || $site->exists($line->multi)) {
 							$label_add = ' (';

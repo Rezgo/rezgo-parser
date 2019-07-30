@@ -1,4 +1,4 @@
-<?
+<?php
 	// the paypal process was cancelled. Show this to the user in the modal window.
 ?>
 

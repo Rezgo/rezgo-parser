@@ -1,4 +1,4 @@
-<?
+<?php
 	$trans_num = $site->decode($_REQUEST['trans_num']);
 
 	// send the user home if they shoulden't be here
@@ -132,7 +132,7 @@
             <button class="btn btn-lg rezgo-btn-print-voucher" onclick="window.open('https://<?php echo $site->getDomain();?>.<?php echo $role?>rezgo.com/tickets/<?php echo $site->encode($trans_num)?>', '_blank'); return false;"><i class="fa fa-ticket fa-lg"></i>&nbsp;Print <?php echo ((string) $booking->ticket_type == 'ticket') ? 'Tickets' : 'Voucher' ?></button>
 					<?php } ?>
           
-					<?
+					<?php
 						if($site->isVendor()) { 
 							$supplier = $site->getCompanyDetails($booking->cid);
 							$show_reviews = $supplier->reviews;
@@ -395,7 +395,7 @@
                   <a href="https://www.google.com/maps/place/<?php echo urlencode($pickup_detail->lat.','.$pickup_detail->lon)?>" target="_blank"><i class="fa fa-map-marker"></i> <?php echo $pickup_detail->location_address;?></a><br />
                   <?php } ?>
                   
-                  <?
+                  <?php
 									
 									if($site->exists($pickup_detail->lat) && !REZGO_CUSTOM_DOMAIN) { 
 									
@@ -627,7 +627,7 @@
                 
                 <?php if ($form->options_instructions) { ?>
               
-									<?
+									<?php
                     $options = explode(',', (string) $form->options);
                     $options_instructions = explode(',', (string) $form->options_instructions);
                     $option_extras = array_combine($options, $options_instructions);
@@ -637,7 +637,7 @@
                   
                     <?php if ( $form->type == 'multiselect' ) { ?>
                     
-                      <?
+                      <?php
                         $multi_answers = explode(',', (string) $form->answer);
                         $multi_answer_list = '';
                         foreach ($multi_answers as $answer) {
@@ -731,7 +731,7 @@
                   
                   <?php if ($form->options_instructions) { ?>
               
-										<?
+										<?php
                       $pax_options = explode(',', (string) $form->options);
                       $pax_options_instructions = explode(',', (string) $form->options_instructions);
                       $pax_option_extras = array_combine($pax_options, $pax_options_instructions);
@@ -741,7 +741,7 @@
                     
                       <?php if ( $form->type == 'multiselect' ) { ?>
                         
-                        <?
+                        <?php
                           $pax_multi_answers = explode(',', (string) $form->answer);
                           $pax_multi_answer_list = '';
                           foreach ($pax_multi_answers as $pax_answer) {

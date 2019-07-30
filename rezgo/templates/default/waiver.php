@@ -1,4 +1,4 @@
-<?
+<?php
 	$company = $site->getCompanyDetails();	
 ?>
 <a name="waiver-top"></a>
@@ -289,7 +289,7 @@
         
         <hr />
         
-        <?
+        <?php
 				if ($waiver_type == 'booking') {
 					
 					$total_pax = $total_signed = 0;
@@ -329,7 +329,7 @@
             </div>
           </div>
           
-          <?
+          <?php
 					
 				} // if ($waiver_type == 'booking')
 				
@@ -683,7 +683,7 @@
               <td class="rezgo-td-label">Child's Waiver</td>
               <td class="rezgo-td-data" id="rezgo-waiver-child"><span></span></td>
             </tr>
-            <?
+            <?php
 						foreach ($group_forms as $gk => $gv) {
 							echo '
 							<tr class="rezgo-waiver-group-form">
