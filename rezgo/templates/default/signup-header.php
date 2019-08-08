@@ -1,4 +1,4 @@
-<? if(!$site->config('REZGO_HIDE_HEADERS')) { ?>
+<?php if (!$site->config('REZGO_HIDE_HEADERS')) { ?>
 	<?php
 		header('Cache-Control: no-cache');
 	  header('Pragma: no-cache');
@@ -6,18 +6,16 @@
 	  header('Content-Type: text/html; charset=utf-8');
 	?>
 	
-	<?=$site->getHeader()?>	
-<? } ?>
+	<?php echo $site->getHeader()?>	
+<?php} ?>
 
-<!--[if lte IE 6]><script src="<?=$this->path?>/js/ie6/warning.js"></script><script>window.onload=function(){e("<?=$this->path?>/js/ie6/")}</script><![endif]-->
+<!--[if lte IE 6]><script src="<?php echo $this->path?>/js/ie6/warning.js"></script><script>window.onload=function(){e("<?php echo $this->path?>/js/ie6/")}</script><![endif]-->
 
 
-<? if($site->exists($site->getStyles())) { ?>
+<?php if($site->exists($site->getStyles())) { ?>
 <style>
-<!--
 
-	<?=$site->getStyles()?>
+	<?php echo $site->getStyles()?>
 
--->
 </style>
-<? } ?>
+<?php} ?>
