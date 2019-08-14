@@ -1,10 +1,10 @@
-<? if(strpos(getenv("DOCUMENT_ROOT"), 'dev') !== false) { ?>
+<?php if(strpos(getenv("DOCUMENT_ROOT"), 'dev') !== false) { ?>
 	User-agent: *
 	Disallow: /
-<? } elseif(strpos(getenv("DOCUMENT_ROOT"), 'beta') !== false) { ?>
+<?php } elseif(strpos(getenv("DOCUMENT_ROOT"), 'beta') !== false) { ?>
 	User-agent: *
 	Disallow: /
-<? } else { ?>
+<?php } else { ?>
 	User-agent: *
 	Allow: /
-<? } ?>
+<?php } ?>

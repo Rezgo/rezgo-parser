@@ -7,4 +7,4 @@
 	$site = new RezgoSite();
 ?>
 
-<?=$site->getTemplate('calendar')?>
+<?php echo $site->getTemplate('calendar')?>

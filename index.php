@@ -20,8 +20,8 @@
 	$site->setTourLimit(REZGO_RESULTS_PER_PAGE + 1, $start);
 ?>
 
-<?=$site->getTemplate('frame_header')?>
+<?php echo $site->getTemplate('frame_header')?>
 
-<?=$site->getTemplate('index')?>
+<?php echo $site->getTemplate('index')?>
 
-<?=$site->getTemplate('frame_footer')?>
+<?php echo $site->getTemplate('frame_footer')?>

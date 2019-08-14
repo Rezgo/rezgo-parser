@@ -8,4 +8,4 @@
 		
 ?>
 
-<?=$site->getTemplate('edit_pax')?>
+<?php echo $site->getTemplate('edit_pax')?>

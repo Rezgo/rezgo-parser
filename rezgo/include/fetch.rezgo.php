@@ -8,15 +8,14 @@
 	curl_setopt($ch, CURLOPT_FRESH_CONNECT, TRUE);
 	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-	curl_setopt($ch, CURLOPT_TIMEOUT,30);
-	
-  if ($post) {
-    curl_setopt($ch,CURLOPT_POSTFIELDS, $post);
-  }
+	curl_setopt($ch, CURLOPT_TIMEOUT, 220);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+
+	if($post) curl_setopt($ch,CURLOPT_POSTFIELDS, $post);
 	
 	$result = curl_exec($ch);	
 	
-	if (curl_error($ch)) {
+	if(curl_error($ch)) {
 		$this->error(curl_error($ch).' (outbound: '.$url.')');
 	}
 	

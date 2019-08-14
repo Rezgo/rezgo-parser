@@ -20,7 +20,7 @@ include_once('includes/global_config.inc.php');
 <html>
 <head><title>Pay with a PayPal account</title></head>
 <body onLoad="document.paypal_form.submit();">
-<form method="post" name="paypal_form" action="<?=$paypal[url]?>">
+<form method="post" name="paypal_form" action="<?php echo $paypal[url]?>">
 <?php
 //show paypal hidden variables
 showVariables();

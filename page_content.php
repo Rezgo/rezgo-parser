@@ -11,8 +11,8 @@
 	$site->setPageTitle($title);
 ?>
 
-<?=$site->getTemplate('frame_header')?>
+<?php echo $site->getTemplate('frame_header')?>
 
-<?=$site->getTemplate('content_page')?>
+<?php echo $site->getTemplate('content_page')?>
 
-<?=$site->getTemplate('frame_footer')?>
+<?php echo $site->getTemplate('frame_footer')?>

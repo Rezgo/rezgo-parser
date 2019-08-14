@@ -8,8 +8,8 @@
 	
 ?>
 
-<?=$site->getTemplate('frame_header')?>
+<?php echo $site->getTemplate('frame_header')?>
 
-<?=$site->getTemplate('about')?>
+<?php echo $site->getTemplate('about')?>
 			
-<?=$site->getTemplate('frame_footer')?>
+<?php echo $site->getTemplate('frame_footer')?>

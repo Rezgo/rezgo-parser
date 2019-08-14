@@ -8,4 +8,4 @@
 	
 ?>
 
-<?=$site->getTemplate('calendar_day')?>
+<?php echo $site->getTemplate('calendar_day')?>

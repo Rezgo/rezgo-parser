@@ -9,8 +9,8 @@
 	
 ?>
 
-<?=$site->getTemplate('frame_header')?>
+<?php echo $site->getTemplate('frame_header')?>
 
-<?=$site->getTemplate('contact')?>
+<?php echo $site->getTemplate('contact')?>
 
-<?=$site->getTemplate('frame_footer')?>
+<?php echo $site->getTemplate('frame_footer')?>

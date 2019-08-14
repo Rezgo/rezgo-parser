@@ -7,4 +7,4 @@
 	$site = new RezgoSite(secure);
 ?>
 
-<?=$site->getTemplate('booking_payment')?>
+<?php echo $site->getTemplate('booking_payment')?>
