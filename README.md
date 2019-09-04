@@ -1,7 +1,7 @@
 # Rezgo Parser
 
 VERSION
-	3.0.0
+	3.0.1
 	
 AUTHOR
 	Kevin Campbell
@@ -19,6 +19,8 @@ INSTALL INSTRUCTIONS
 
 VERSION HISTORY
 
+	3.0.1
+		- Bug fixes
 	3.0.0
 		- Updates to bring parser inline with white label
 	2.5.0
