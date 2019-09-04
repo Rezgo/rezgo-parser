@@ -1,1 +1,0 @@
-/var/www/booking-server/images.rezgo.com

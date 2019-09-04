@@ -19,7 +19,6 @@ AddType video/webm webm
 
 RewriteEngine on
 
-
 # -------------------------------------------------
 # Rules for the new parser addresses
 # -------------------------------------------------
@@ -37,6 +36,7 @@ RewriteRule ^tour/([0-9]+)/([^\/]+)/([0-9]+)/([^\/]+)/?$ details/$1/$2/$3/$4 [L,
 # pre made content pages
 RewriteRule ^contact/?$ frame.php?mode=page_contact&title=Contact+Us [QSA]
 RewriteRule ^terms/?$ frame.php?mode=page_terms&title=Booking+Terms [QSA]
+RewriteRule ^privacy/?$ frame.php?mode=page_privacy&title=Privacy+Policy [QSA]
 RewriteRule ^about/?$ frame.php?mode=page_about&title=About+Us [QSA]
 
 # all custom created content pages
@@ -59,18 +59,42 @@ RewriteRule ^book/?$ frame.php?mode=page_book&sec=1&title=Book+Now [QSA]
 
 # complete print and complete display page
 RewriteRule ^complete/([^\/]*)/print/?$ booking_complete_print.php?trans_num=$1&title=Booking+Receipt [QSA]
-RewriteRule ^complete/([^\/]*)/pdf/?$ booking_complete_pdf.php?trans_num=$1&title=Booking+Receipt [QSA] 
+RewriteRule ^complete/([^\/]*)/pdf/?$ booking_complete_pdf.php?trans_num=$1&title=Booking+Receipt [QSA]
 RewriteRule ^complete/([^\/]*)/?$ frame.php?mode=booking_complete&trans_num=$1&title=Booking+Receipt [QSA]
 
+# gift pages
+RewriteRule ^gift-card/?$ frame.php?mode=gift_card&sec=1 [QSA]
+RewriteRule ^gift-card/([^\/]*) frame.php?mode=gift_card_details&card=$1 [QSA]
+RewriteRule ^gift-receipt/?$ frame.php?mode=gift_card_receipt [QSA]
+RewriteRule ^gift-print/([^\/]*) gift_card_print.php?mode=gift_card_print&card=$1 [QSA]
+RewriteRule ^gift-not-found/?$ frame.php?mode=gift_card_not_found [QSA]
+
 # voucher page
-RewriteRule ^voucher/([^\/]*)/?$ booking_voucher.php?trans_num=$1&title=Booking+Voucher [QSA]
-RewriteRule ^voucher/([^\/]*)/pdf/?$ booking_voucher_pdf.php?trans_num=$1&title=Booking+Voucher [QSA]
+RewriteRule ^voucher/([^\/]*)/?$ booking_tickets.php?trans_num=$1&title=Booking+Voucher [QSA]
+
+# tickets page
+RewriteRule ^tickets/([^\/]*)/?$ booking_tickets.php?trans_num=$1&title=Booking+Tickets [QSA]
+RewriteRule ^tickets/([^\/]*)/print/?$ booking_tickets.php?trans_num=$1&title=Booking+Tickets&print=1 [QSA]
+
+# waiver page
+RewriteRule ^waiver/?$ frame.php?mode=page_waiver&sec=1&title=Waiver [QSA]
+RewriteRule ^waiver/([^\/]*)/?$ frame.php?mode=page_waiver&sec=1&trans_num=$1&title=Waiver [QSA]
+# RewriteRule ^waiver/print/?$ waiver_print.php?title=Waiver [QSA]
+RewriteRule ^waiver/([^\/]*)/print/?$ waiver_print.php?trans_num=$1&title=Waiver [QSA]
+
+# review pages
+RewriteRule ^reviews/?$ frame.php?mode=page_review&title=Reviews [QSA]
+RewriteRule ^reviews/([^\/]*)/?$ frame.php?mode=page_review&trans_num=$1&title=Reviews [QSA]
+RewriteRule ^reviews/item/([^\/]*)/?$ frame.php?mode=page_review&com=$1&title=Reviews [QSA]
 
 # summary page (for back-end use)
 RewriteRule ^summary/([^\/]*)/?$ booking_summary.php?trans_num=$1&title=Booking+Summary [QSA]
 
 # cookie policy for EU suppliers
 RewriteRule ^cookie-policy/?$ frame.php?mode=page_cookies&title=Cookie+Policy [QSA]
+
+# modal
+# RewriteRule ^modal/?$ modal.php [QSA]
 
 # dynamic robots.txt
 RewriteRule ^robots\.txt$ /robots.php
