@@ -140,6 +140,16 @@
 							$show_reviews = $company->reviews;
 						}
           ?>
+
+					<?php if	( 
+								($booking->status != 3) && 
+								$show_reviews == 1 && 
+								!$booking->reviewed && 
+								$booking->com != '' && 
+								(((string) $booking->date != 'open' && $booking->date < strtotime('yesterday')) || 
+								(int) $booking->checkin_state > 0 )) { ?>
+						<button class="btn btn-lg rezgo-btn-leave-review" onclick="top.location.href='<?php echo $site->base?>/reviews/<?php echo $site->waiver_encode($trans_num)?>'"><i class="fa fa-star-o fa-lg"></i>&nbsp;Leave a Review</button>
+					<?php } ?>
                               
 				</div>
 			</div>
