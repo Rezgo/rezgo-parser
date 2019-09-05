@@ -17,8 +17,10 @@ INSTALL INSTRUCTIONS
 		(you may need to edit this file further if you are installing in a sub-directory)
 	Make sure your apache config Options allow MultiViews.  
 
-VERSION HISTORY
+VERSION HISTORY 
 
+	3.0.2
+		- Fixes to pages and reviews
 	3.0.1
 		- Bug fixes
 	3.0.0
