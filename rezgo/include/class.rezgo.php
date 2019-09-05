@@ -928,22 +928,6 @@
 					$this->review_response = $xml;
 				}
 			}	
-			// !i=add_review
-			if($i == 'add_review') {
-				//$query = 'https://'.$this->xml_path.'&i=add_review&'.$arguments;
-				$query = 'https://'.$this->xml_path;
-
-				$post = $this->api_post_string.urlencode('<instruction>add_review</instruction>'.$arguments.'</request>');
-			
-				$xml = $this->fetchXML($query, $post);
-				
-				if($xml) {
-					$this->review_response = new stdClass();
-					foreach($xml as $k => $v) {
-						$this->review_response->$k = trim((string)$v);	
-					}
-				}
-			}
 			// !i=pickup
 			if($i == 'pickup') {
 				$query = 'https://'.$this->xml_path.'&i=pickup&'.$arguments;
