@@ -11,6 +11,14 @@
 
 <?php echo $site->getTemplate('frame_header')?>
 
-<?php echo $site->getTemplate('review_list')?>
+<?php if ($_REQUEST['trans_num'] && $_REQUEST['trans_num'] != 'all') { ?>
+
+	<?php echo $site->getTemplate('review')?>
+
+<?php } else { ?>
+
+	<?php echo $site->getTemplate('review_list')?>
+
+<?php } ?>
 
 <?php echo $site->getTemplate('frame_footer')?>
