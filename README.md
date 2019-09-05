@@ -1,7 +1,7 @@
 # Rezgo Parser
 
 VERSION
-	3.0.1
+	3.0.2
 	
 AUTHOR
 	Kevin Campbell
