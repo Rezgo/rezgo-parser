@@ -4,8 +4,8 @@
 // Get current system version
 // ------------------------------------------------------------------------
 	$docroot = getenv("DOCUMENT_ROOT");
-	$rezgo_version = file_get_contents($docroot."/README.md");
-	define(REZGO_VERSION, $rezgo_version);
+	
+	define(REZGO_VERSION, '3.0.3');
 
 	/*
 		---------------------------------------------------------------------------

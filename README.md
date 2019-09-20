@@ -19,6 +19,8 @@ INSTALL INSTRUCTIONS
 
 VERSION HISTORY 
 
+	3.0.3
+		- Version fix
 	3.0.2
 		- Fixes to pages and reviews
 	3.0.1
