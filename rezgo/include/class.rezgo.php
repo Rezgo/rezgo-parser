@@ -1705,8 +1705,8 @@
 		function getTourRelated(&$obj=null) {
 			if(!$obj) $obj = $this->getItem();			
 			$c = 0;
-			if($obj->related->item) {
-				foreach($obj->related->item as $v) {
+			if($obj->related->items) {
+				foreach($obj->related->items->item as $v) {
 					$ret[$c] = new stdClass();
 					
 					$ret[$c]->com = $v->com;
