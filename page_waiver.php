@@ -4,6 +4,7 @@
 
 	// start a new instance of RezgoSite
 	$site = new RezgoSite(secure);
+	$site->sendTo('/' . $site->requestStr('parent_url'));
 
 	// Page title
 	$site->setPageTitle($_REQUEST['title'] ? $_REQUEST['title'] : 'Waiver');
