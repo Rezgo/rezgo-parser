@@ -201,7 +201,7 @@
 					<?php if($booking->status == 1 OR $booking->status == 4) { ?>
 						<?php $domain = $site->getDomain(); ?>
 
-							<a href="https://<?php echo $domain?>.<?php echo $role?>rezgo.com/tickets/<?php echo $site->encode($booking->trans_num)?>" class="btn btn-lg rezgo-btn-print-voucher btn-block" target="_blank">Print <?php echo ((string) $booking->ticket_type == 'ticket') ? 'Tickets' : 'Voucher' ?></a>
+							<a href="/tickets/<?php echo $site->encode($booking->trans_num)?>" class="btn btn-lg rezgo-btn-print-voucher btn-block" target="_blank">Print <?php echo ((string) $booking->ticket_type == 'ticket') ? 'Tickets' : 'Voucher' ?></a>
 					<?php } ?>
 				</div>
 

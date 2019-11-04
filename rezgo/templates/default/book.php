@@ -163,7 +163,7 @@
 						<div id="rezgo-book-step-one" class="tab-pane active">
 							<div class="row rezgo-breadcrumb-wrp">
 								<ol class="breadcrumb rezgo-breadcrumb hidden-xs">
-									<li id="rezgo-book-step-one-order"><a href="<?php echo $site->path;?>/order"><span>Your Order</span></a></li>
+									<li id="rezgo-book-step-one-order"><a href="/order"><span>Your Order</span></a></li>
 									<li id="rezgo-book-step-one-info" class="active"><span>Guest Information</span></li>
 									<li id="rezgo-book-step-one-billing"><span>Billing Information</span></li>
 									<li id="rezgo-book-step-one-confirmation"><span>Confirmation</span></li>
@@ -581,7 +581,7 @@
 								<div class="row" id="rezgo-booking-btn">
 									<div class="col-sm-6 col-xs-3 rezgo-btn-wrp rezgo-chevron-left">
 										<?php if($site->getCartState()) { ?>
-											<button id="rezgo-book-step-one-btn-back" class="btn rezgo-btn-default btn-lg center-block" type="button" onclick="window.top.location.href='<?php echo $site->base?>/order'; return false;">
+											<button id="rezgo-book-step-one-btn-back" class="btn rezgo-btn-default btn-lg center-block" type="button" onclick="window.top.location.href='/order'; return false;">
 												<span class="hidden-xs">Back to order</span>
 												<span class="visible-xs-inline">
 													<span class="glyphicon glyphicon-chevron-left"></span>
@@ -624,9 +624,9 @@
 
 							<div id="rezgo-book-step-two-crumb" class="row">
 								<ol class="breadcrumb rezgo-breadcrumb hidden-xs">
-									<?php if($site->getCartState()) { ?>
-										<li id="rezgo-book-step-two-order"><a href="<?php echo $site->path; ?>/order"><span>Your Order</span></a></li>
-									<?php } ?>
+									<?php // if($site->getCartState()) { ?>
+										<li id="rezgo-book-step-two-order"><a href="/order"><span>Your Order</span></a></li>
+									<?php // } ?>
 									<li id="rezgo-book-step-two-info">
 										<a href="#" onClick="$('#rezgo-book-tabs a:first').tab('show'); return false;">
 											<span>Guest Information</span>
@@ -2075,13 +2075,13 @@
 		ids = $(this).data('ids'),
 		query = '/modal?mode=waiver&type=order&sec=1&ids=' + ids + '&title=' + rezgoModalTitle;
 
-		window.top.$('#rezgo-modal-loader').css({'display':'block'});
-		window.top.$('#rezgo-modal-iframe').attr('src', query).attr('height', '500px');
-		window.top.$('#rezgo-modal-title').html(rezgoModalTitle);
-		window.top.$('#rezgo-modal').modal();
+		window.top.jQuery('#rezgo-modal-loader').css({'display':'block'});
+		window.top.jQuery('#rezgo-modal-iframe').attr('src', query).attr('height', '500px');
+		window.top.jQuery('#rezgo-modal-title').html(rezgoModalTitle);
+		window.top.jQuery('#rezgo-modal').modal();
 		
-			var x = $("#rezgo-waiver-use").position(); 
-			window.top.$('#rezgo-modal').css({'top':x.top});
+			// var x = $("#rezgo-waiver-use").position(); 
+			// window.top.$('#rezgo-modal').css({'top':x.top});
 	    
 	});
 

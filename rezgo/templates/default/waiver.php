@@ -220,7 +220,7 @@
             	<p>You can now print your waiver or close this page.</p>
             <?php } ?>
             
-            <!--  <?php echo $site->base?>/waiver/<?php echo ($_REQUEST['trans_num'] ? $_REQUEST['trans_num'].'/' : '')?>print  -->
+           
             <div class="col-xs-12 col-md-6" id="rezgo-waiver-print">
               <a href="javascript:void(0);" onclick="window.print();" class="btn btn-lg rezgo-btn-print btn-block">
                 <i class="fa fa-print bigger-110"></i>&nbsp;<span>Print Waiver</span>
@@ -795,8 +795,8 @@
 			
 			// the field is present? submit normally
 			$('#pax_waiver_form').ajaxSubmit({
-				url: '<?php echo $site->base?>/waiver_ajax.php', 
-				data: { action: 'sign' },
+				url: '<?php echo $site->base?>/waiver_ajax.php?action=sign', 
+				//data: { action: 'sign' },
 				success: function(response) { 
 					if (response == 'signed') {
 						addSignature(signaturePad.toDataURL());

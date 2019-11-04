@@ -6,12 +6,12 @@
 	// start a new instance of RezgoSite
 	$site = new RezgoSite(secure);
 	
-	$response = 'empty';
+	$response = 'empty';                       
 
 	// save signed waiver
 	if ($_REQUEST['action'] == 'sign') {
 		
-		$result = $site->signWaiver();
+		$result = $site->signWaiver(); 
 		
 		if ($result->status == 'signed') {
 			
