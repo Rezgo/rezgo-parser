@@ -23,7 +23,6 @@
     
     	<div class="col-xs-4 col-sm-2">
         <div id="rezgo-secure-seal">
-          <div id="trustwave-seal"><script type="text/javascript" src="https://sealserver.trustwave.com/seal.js?style=invert"></script></div>
         </div>
       </div>
     
