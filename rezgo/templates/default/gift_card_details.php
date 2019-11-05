@@ -21,7 +21,7 @@ $billing = $card->billing;
 					<h3><span>Gift Card Details</span></h3>
 					<p><span>Click the button below to print your gift card.</span></p>
 					<center>
-						<a class="btn btn-lg rezgo-btn-print" href="<?php echo $site->path;?>/gift-print/<?php echo $_REQUEST['card']?>" target="_blank">
+						<a class="btn btn-lg rezgo-btn-print" href="/gift-print/<?php echo $_REQUEST['card']?>" target="_blank">
 							<i class="fa fa-print fa-lg"></i>
 							<span>&nbsp;PRINT GIFT CARD</span>
 						</a>

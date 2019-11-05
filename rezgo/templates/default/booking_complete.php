@@ -129,7 +129,7 @@
 				
 
 					<?php if ($show_voucher) { ?>
-            <button class="btn btn-lg rezgo-btn-print-voucher" onclick="window.open('https://<?php echo $site->getDomain();?>.<?php echo $role?>rezgo.com/tickets/<?php echo $site->encode($trans_num)?>', '_blank'); return false;"><i class="fa fa-ticket fa-lg"></i>&nbsp;Print <?php echo ((string) $booking->ticket_type == 'ticket') ? 'Tickets' : 'Voucher' ?></button>
+            <button class="btn btn-lg rezgo-btn-print-voucher" onclick="window.open('/tickets/<?php echo $site->encode($trans_num)?>', '_blank'); return false;"><i class="fa fa-ticket fa-lg"></i>&nbsp;Print <?php echo ((string) $booking->ticket_type == 'ticket') ? 'Tickets' : 'Voucher' ?></button>
 					<?php } ?>
           
 					<?php
@@ -154,7 +154,7 @@
             }
             echo '<span><span id="pax-signed">' . $pax_signed . '</span> of ' . $pax_count . ' passengers have signed waivers.</span><br />';
 						if ($pax_signed != $pax_count) { // hide if all waivers signed
-							echo '&nbsp;<a href="'.$site->base.'/waiver/'.$site->waiver_encode($booking->trans_num).'" class="btn btn-lg rezgo-waiver-btn"><span><i class="fa fa-pencil-square-o"></i>&nbsp;Sign waivers</span></a>';
+							echo '&nbsp;<a href="'.$site->getDomain().'.rezgo.com/waiver/'.$site->waiver_encode($booking->trans_num).'" class="btn btn-lg rezgo-waiver-btn"><span><i class="fa fa-pencil-square-o"></i>&nbsp;Sign waivers</span></a>';
 						}
           ?>
         </div>
@@ -675,7 +675,7 @@
                   <td class="rezgo-td-label"><?php echo $passenger->label?>&nbsp;<?php echo $passenger->num?></td>
                   <td class="rezgo-td-data">
                   <?php if( $booking->waiver == '2' ) { ?>
-                    <button class="btn rezgo-btn-default btn-sm rezgo-waiver-sign" type="button" data-paxid="<?php echo $passenger->id?>" id="rezgo-sign-<?php echo $passenger->id?>" <?php echo (($passenger->signed) ? ' style="display:none;"' : '')?> onclick="window.top.location.href='<?php echo $site->base.'/waiver/'.$site->waiver_encode($booking->trans_num.'-'.$passenger->id)?>'">
+                    <button class="btn rezgo-btn-default btn-sm rezgo-waiver-sign" type="button" data-paxid="<?php echo $passenger->id?>" id="rezgo-sign-<?php echo $passenger->id?>" <?php echo (($passenger->signed) ? ' style="display:none;"' : '')?> onclick="window.top.location.href='<?php echo $site->getDomain().'.rezgo.com/waiver/'.$site->waiver_encode($booking->trans_num.'-'.$passenger->id)?>'">
                       <span><i class="fa fa-pencil-square-o"></i>&nbsp;<span id="rezgo-sign-txt-<?php echo $passenger->id?>">sign waiver</span></span>
                     </button>
                      

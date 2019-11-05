@@ -4,8 +4,8 @@
 // Get current system version
 // ------------------------------------------------------------------------
 	$docroot = getenv("DOCUMENT_ROOT");
-	
-	define(REZGO_VERSION, '3.0.3');
+	$rezgo_version = file_get_contents($docroot."/README.md");
+	define(REZGO_VERSION, $rezgo_version);
 
 	/*
 		---------------------------------------------------------------------------
@@ -23,15 +23,14 @@
 
 	// Your company ID and your API KEY for the Rezgo API, they can both be found
 	// on the main settings page on the Rezgo back-end.
-	define(	"REZGO_CID", "");
-	define(	"REZGO_API_KEY", "");
+	define(	"REZGO_CID", "552");
+	define(	"REZGO_API_KEY", "1C6-O7B7-A1O0-E5A");
+	//define(	"REZGO_CID", "2075");
+	//define(	"REZGO_API_KEY", "7X6-R5I5-J3G9-I3H");
 
 	// RECAPTCHA API keys for the contact page (get recaptcha: http://www.google.com/recaptcha)
 	define("REZGO_CAPTCHA_PUB_KEY", "");
 	define("REZGO_CAPTCHA_PRIV_KEY", "");
-
-	// Google Maps API key
-	define("GOOGLE_API_KEY", "");
 
 	// Path to the rezgo install on your server, the default is /rezgo in the root.
 	// this is used by the template includes as well as fetching files in the templates
@@ -120,14 +119,14 @@
 	define("DEBUG", 0);
 
 	// Output all API transactions. THIS MUST BE SET TO 1 TO USE THE SETTINGS BELOW
-	define(	"REZGO_TRACE_XML",0);
+	define(	"REZGO_TRACE_XML",						0																						);
 	
 
 	// Include calls to the API Cache (repeat queries) in the API output
 	define(	"REZGO_INCLUDE_CACHE_XML",		0																						);
 
 	// Send the API requests to console, to avoid disrupting the page design
-	define(	"REZGO_FIREBUG_XML",					0																						);
+	define(	"REZGO_FIREBUG_XML",					1																						);
 
 	// Switch the commit API debug for one more suited for AJAX
 	define(	"REZGO_SWITCH_COMMIT",				0																						);

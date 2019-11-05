@@ -13,7 +13,6 @@
 
 	// set a default page title
 	$site->setPageTitle((($_REQUEST['title']) ? $_REQUEST['title'] : ucwords(str_replace("page_", "", $_REQUEST['mode']))));
-	$site->setMetaTags('<link rel="canonical" href="'.(string) $company->primary_domain.'" />');
 
 	if ($_REQUEST['mode'] == 'page_details') {
 		/*
@@ -51,7 +50,6 @@
 			<meta property="og:description" content="' . $page_description . '" />
 			<meta property="og:image" content="' . $item->media->image[0]->path . '" />
 			<meta http-equiv="X-UA-Compatible" content="IE=edge">
-			<link rel="canonical" href="https://'.(string) $company->primary_domain.$_SERVER['REQUEST_URI'].'" />
 		');
 	} elseif ($_REQUEST['mode'] == 'page_content') {
 		$title = $site->getPageName($page);
