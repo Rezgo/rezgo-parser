@@ -19,6 +19,8 @@ INSTALL INSTRUCTIONS
 
 VERSION HISTORY 
 
+	3.0.4
+		- Bug fixes
 	3.0.3
 		- Version fix
 	3.0.2
