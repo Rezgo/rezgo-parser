@@ -387,7 +387,7 @@
                   
                   <?php
 									
-									if($site->exists($pickup_detail->lat) && !REZGO_CUSTOM_DOMAIN) { 
+									if($site->exists($pickup_detail->lat)) { 
 									
 										if(!$site->exists($pickup_detail->zoom)) { $map_zoom = 8; } else { $map_zoom = $pickup_detail->zoom; }
 										
@@ -482,7 +482,7 @@
 			</div>
 			<!-- // tour confirmation--> 
 
-			<?php if($item->lat != '' && $item->lon != '' && !REZGO_CUSTOM_DOMAIN) { ?>
+			<?php if($item->lat != '' && $item->lon != '') { ?>
         
 				<?php 
 					
