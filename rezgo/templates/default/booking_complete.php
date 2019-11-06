@@ -143,7 +143,7 @@
                               
 				</div>
 			</div>
-
+            <?php $domain = "https://".$site->getDomain(); ?>
 			<?php if( $booking->waiver == '2' ) {  ?>
         <div class="row rezgo-waiver-count">
 					<?php 
@@ -154,7 +154,7 @@
             }
             echo '<span><span id="pax-signed">' . $pax_signed . '</span> of ' . $pax_count . ' passengers have signed waivers.</span><br />';
 						if ($pax_signed != $pax_count) { // hide if all waivers signed
-							echo '&nbsp;<a href="'.$site->getDomain().'.rezgo.com/waiver/'.$site->waiver_encode($booking->trans_num).'" class="btn btn-lg rezgo-waiver-btn"><span><i class="fa fa-pencil-square-o"></i>&nbsp;Sign waivers</span></a>';
+							echo '&nbsp;<a href="'.$domain.'.rezgo.com/waiver/'.$site->waiver_encode($booking->trans_num).'" class="btn btn-lg rezgo-waiver-btn"><span><i class="fa fa-pencil-square-o"></i>&nbsp;Sign waivers</span></a>';
 						}
           ?>
         </div>
@@ -675,7 +675,7 @@
                   <td class="rezgo-td-label"><?php echo $passenger->label?>&nbsp;<?php echo $passenger->num?></td>
                   <td class="rezgo-td-data">
                   <?php if( $booking->waiver == '2' ) { ?>
-                    <button class="btn rezgo-btn-default btn-sm rezgo-waiver-sign" type="button" data-paxid="<?php echo $passenger->id?>" id="rezgo-sign-<?php echo $passenger->id?>" <?php echo (($passenger->signed) ? ' style="display:none;"' : '')?> onclick="window.top.location.href='<?php echo $site->getDomain().'.rezgo.com/waiver/'.$site->waiver_encode($booking->trans_num.'-'.$passenger->id)?>'">
+                    <button class="btn rezgo-btn-default btn-sm rezgo-waiver-sign" type="button" data-paxid="<?php echo $passenger->id?>" id="rezgo-sign-<?php echo $passenger->id?>" <?php echo (($passenger->signed) ? ' style="display:none;"' : '')?> onclick="window.top.location.href='<?php echo $domain.'.rezgo.com/waiver/'.$site->waiver_encode($booking->trans_num.'-'.$passenger->id)?>'">
                       <span><i class="fa fa-pencil-square-o"></i>&nbsp;<span id="rezgo-sign-txt-<?php echo $passenger->id?>">sign waiver</span></span>
                     </button>
                      

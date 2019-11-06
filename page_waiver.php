@@ -3,8 +3,9 @@
 	require('rezgo/include/page_header.php');
 
 	// start a new instance of RezgoSite
-	$site = new RezgoSite(secure);
-	$site->sendTo('/' . $site->requestStr('parent_url'));
+	$site = new RezgoSite(secure);  
+	$domain = "https://".$site->getDomain();
+	$site->sendTo($domain.'.rezgo.com/waiver/');
 
 	// Page title
 	$site->setPageTitle($_REQUEST['title'] ? $_REQUEST['title'] : 'Waiver');
