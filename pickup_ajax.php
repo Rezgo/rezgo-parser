@@ -106,7 +106,7 @@
 			
 			$response .= '&nbsp;</div>';
 			
-			if($site->exists($pickup_detail->lat) && !REZGO_CUSTOM_DOMAIN) { 
+			if($site->exists($pickup_detail->lat)) { 
 			
 	      if(!$site->exists($pickup_detail->zoom)) { $map_zoom = 8; } else { $map_zoom = $pickup_detail->zoom; }
 				
@@ -149,7 +149,7 @@
 			
 			$response .= '&nbsp;</div>';
 			
-			if($site->exists($pickup_detail->lat) && !REZGO_CUSTOM_DOMAIN) { 
+			if($site->exists($pickup_detail->lat)) { 
 			
 	      if(!$site->exists($pickup_detail->zoom)) { $map_zoom = 8; } else { $map_zoom = $pickup_detail->zoom; }
 				

@@ -195,7 +195,7 @@
         }
       ?>
 			<div class="col-sm-12 col-md-9">
-				<?php if ($company->map->lat != '' && $company->map->lon != '' && !REZGO_CUSTOM_DOMAIN) { ?>
+				<?php if ($company->map->lat != '' && $company->map->lon != '') { ?>
 				<div class="rezgo-map" id="rezgo-company-map">
           <iframe width="100%" height="500" frameborder="0" style="border:0;margin-bottom:0;margin-top:-105px;" src="https://www.google.com/maps/embed/v1/place?key=<?php echo GOOGLE_API_KEY?>&maptype=roadmap&q=<?php echo $company->map->lat?>,<?php echo $company->map->lon?>&center=<?php echo $company->map->lat?>,<?php echo $company->map->lon?>&zoom=<?php echo $map_zoom?>"></iframe>
         </div>

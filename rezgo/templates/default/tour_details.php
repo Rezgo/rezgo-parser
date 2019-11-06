@@ -750,7 +750,7 @@ if(!$items) { ?>
 		</div><!-- // .rezgo-left-wrp -->
 
 		<div class="col-md-4 col-sm-5 col-xs-12 rezgo-right-wrp pull-right">
-			<?php if($site->exists($item->lat) && !REZGO_CUSTOM_DOMAIN) { ?>
+			<?php if($site->exists($item->lat)) { ?>
 
 				<?php 
 				
