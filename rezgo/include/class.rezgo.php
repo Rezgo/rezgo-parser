@@ -145,11 +145,7 @@
 			if(!defined(REZGO_DOCUMENT_ROOT)) define("REZGO_DOCUMENT_ROOT", $_SERVER["DOCUMENT_ROOT"]);
 			
 			// set the secure mode for this particular page
-			if (REZGO_CUSTOM_DOMAIN) {
-				$this->setSecure($secure);
-			} else {
-				$this->setSecure('secure');
-			}
+			$this->setSecure($secure);
 			
 			// perform some variable filtering
 			if($_REQUEST['start_date']) {
