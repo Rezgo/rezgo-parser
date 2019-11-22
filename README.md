@@ -19,6 +19,8 @@ INSTALL INSTRUCTIONS
 
 VERSION HISTORY 
 
+	3.0.5
+		- Removing GA code
 	3.0.4
 		- Bug fixes
 	3.0.3
